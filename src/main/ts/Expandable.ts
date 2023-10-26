@@ -1,6 +1,5 @@
-///<reference path="typedefs/jquery.d.ts"/>
+import $ from "jquery";
 
-module Gitline {
 	export interface HTMLExpandableElement extends HTMLElement {
 		whenShort(innerHTML: string): void;
 		whenFull(innerHTML: string): void;
@@ -54,4 +53,3 @@ module Gitline {
 			}
 		}
 	}
-}

@@ -1,11 +1,7 @@
-///<reference path="../CommitProvider.ts"/>
-///<reference path="../typedefs/jquery.d.ts"/>
-///<reference path="../typedefs/moment-node.d.ts"/>
-///<reference path="../typedefs/moment.d.ts"/>
+import moment from "moment";
+import { CommitProvider } from "../CommitProvider";
+import { getJSON, when } from "jquery"
 
-declare var Logger: any;
-
-module Gitline.Plugin.Github {
 	export interface Branch {
 		name: string;
 		repo: string;
@@ -23,18 +19,14 @@ module Gitline.Plugin.Github {
 	export interface Commit {
 		sha: string;
 	}
-}
-
-module Gitline.Plugin {
-	import Github = Gitline.Plugin.Github;
 
 	/**
 	 * GitHub commit provider. only works if there is and accesstoken configured in the browser
 	 */
-	export class GithubCommitProvider extends Gitline.CommitProvider {
+	export class GithubCommitProvider extends CommitProvider {
 
-		private forks: Github.Fork[] = [];
-		private baseBranches: Github.Branch[] = [];
+		private forks: Fork[] = [];
+		private baseBranches: Branch[] = [];
 		private data: {} = {};
 
 		private limit: number;
@@ -61,13 +53,13 @@ module Gitline.Plugin {
 		}
 
 		public loadForks(url: string) {
-			jQuery.getJSON(this.gitURL(url, "forks")).done((forks) => {
+			getJSON(this.gitURL(url, "forks")).done((forks) => {
 				if (forks.data.message !== undefined) {
 					this.error("Github API: " + forks.data.message);
 					return;
 				}
 
-				jQuery.getJSON(this.gitURL(url, "branches")).done((branches) => {
+				getJSON(this.gitURL(url, "branches")).done((branches) => {
 					this.processBranches(url, branches.data);
 					this.forks = forks.data;
 
@@ -76,7 +68,7 @@ module Gitline.Plugin {
 			});
 		}
 
-		public processBranches(fork, data: Github.Branch[]) {
+		public processBranches(fork, data: Branch[]) {
 			data.forEach(branch => {
 				branch.repo = fork.url !== undefined ? fork.url : fork;
 				if (fork.full_name !== undefined) {
@@ -88,13 +80,13 @@ module Gitline.Plugin {
 
 		public loadBranches() {
 			var forkRequests = this.forks.map(fork => {
-				return jQuery.getJSON(this.gitURL(fork.url, "branches"), data => {
-					Logger.debug("loaded branches for " + fork.name);
+				return getJSON(this.gitURL(fork.url, "branches"), data => {
+					console.debug("loaded branches for " + fork.name);
 					this.processBranches(fork, data.data);
 				})
 			});
-			jQuery.when.apply(jQuery, forkRequests).done(() => {
-				Logger.debug("all branches loaded");
+			when.apply($, forkRequests).done(() => {
+				console.debug("all branches loaded");
 				this.loadCommits();
 			});
 		}
@@ -105,14 +97,14 @@ module Gitline.Plugin {
 				var commit = this.data[b.commit.sha];
 				if (commit == undefined) {
 					commitRequests.push(
-						jQuery.getJSON(this.gitURL(b.repo, "commits", "sha=" + b.commit.sha), data => {
-							Logger.debug("loaded commits for " + b.name);
+						getJSON(this.gitURL(b.repo, "commits", "sha=" + b.commit.sha), data => {
+							console.debug("loaded commits for " + b.name);
 							this.processCommits(data.data);
 						}));
 				}
 			});
 
-			jQuery.when.apply(jQuery, commitRequests).done(() => {
+			when.apply($, commitRequests).done(() => {
 				this.process();
 			});
 		}
@@ -193,4 +185,3 @@ module Gitline.Plugin {
 			}
 		}
 	}
-}

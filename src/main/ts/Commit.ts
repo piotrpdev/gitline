@@ -1,10 +1,8 @@
-///<reference path="Main.ts"/>
-///<reference path="CommitView.ts"/>
-///<reference path="Branch.ts"/>
-///<reference path="typedefs/moment-node.d.ts"/>
-///<reference path="typedefs/moment.d.ts"/>
-
-module Gitline {
+import moment from "moment";
+import { Branch } from "./Branch";
+import { CommitView } from "./CommitView";
+import { indexToX } from "./Config";
+import Gitline from "./Main";
 
 	/** committer or author */
 	export class Identity {
@@ -15,7 +13,7 @@ module Gitline {
 	}
 
 	export class Commit {
-		private container: Gitline.Main;
+		private container: Gitline;
 
 		private warnings: any[] = [];
 		private inHeadsRef: Commit[] = [];
@@ -40,7 +38,7 @@ module Gitline {
 		public committer: Identity;
 		public author: Identity;
 
-		constructor(container: Gitline.Main, data) {
+		constructor(container: Gitline, data) {
 			this.container = container;
 			this.data = data;
 
@@ -134,7 +132,7 @@ module Gitline {
 
 					/* assign the most specific head on this tip commit */
 					if (this.maxSpecifity == null || specifity < this.maxSpecifity) {
-						Logger.debug("assigning branch", refname, this.sha, this.maxSpecifity, specifity)
+						console.debug("assigning branch", refname, this.sha, this.maxSpecifity, specifity)
 						this.maxSpecifity = specifity;
 						this.branch = this.container.headsMap[refname];
 					}
@@ -192,7 +190,7 @@ module Gitline {
 				var child = this;
 
 				while (child != null && child.branch == null) {
-					child = child.directchild;
+					child = child.directchild as this;
 				}
 
 				/* this is only an anonymous branch head, if there is only one child (the merge)
@@ -229,7 +227,7 @@ module Gitline {
 		}
 
 		public getX() {
-			return Gitline.indexToX(this.getLane());
+			return indexToX(this.getLane());
 		}
 
 		public getY() {
@@ -287,7 +285,7 @@ module Gitline {
 
 		public debug(warning: string) {
 			if (console) {
-				Logger.debug(warning, this);
+				console.debug(warning, this);
 			}
 		}
 
@@ -298,4 +296,3 @@ module Gitline {
 			return null;
 		}
 	}
-}

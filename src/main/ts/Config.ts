@@ -1,9 +1,8 @@
-///<reference path="typedefs/cryptojs.d.ts"/>
+import CryptoJS from "crypto-js";
 
 declare var jsgl: any;
-declare var Logger: any;
 
-module Gitline {
+
 	export function indexToX(index: number): number {
 		return index * 20 + 12;
 	}
@@ -20,4 +19,3 @@ module Gitline {
 
 		public avatars: Function[] = [this.avatar_gravatar];
 	}
-}

@@ -1,4 +1,3 @@
-module Gitline {
 	class AsyncLoadingItem {
 		public label: string;
 		public data: any;
@@ -56,7 +55,7 @@ module Gitline {
 				if ((nextItem.index % 50) === 0) {
 					this.showStatus(nextItem);
 					window.setTimeout(() => {
-						Logger.debug("executing " + nextItem.label + " (" + nextItem.index + "/" + nextItem.of + ")");
+						console.debug("executing " + nextItem.label + " (" + nextItem.index + "/" + nextItem.of + ")");
 						this.execute(nextItem);
 					}, 0);
 				} else {
@@ -93,9 +92,8 @@ module Gitline {
 		}
 
 		public error(e: any) {
-			Logger.error(e);
+			console.error(e);
 			this.element.innerHTML = e;
 			this.suspend();
 		}
 	}
-}

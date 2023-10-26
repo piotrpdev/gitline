@@ -1,12 +1,10 @@
-///<reference path="../CommitProvider.ts"/>
-///<reference path="../Main.ts"/>
-///<reference path="../typedefs/jquery.d.ts"/>
-
-module Gitline.Plugin {
-	export class LocalGit2JsonProvider extends Gitline.CommitProvider {
+import { getJSON } from "jquery"
+import { CommitProvider } from "../CommitProvider";
+	
+	export class LocalGit2JsonProvider extends CommitProvider {
 
 		public onRequested(url: string) {
-			var xhr = jQuery.getJSON(url, {});
+			var xhr = getJSON(url, {});
 
 			xhr.done((json) => {
 				this.whenDone(json);
@@ -17,4 +15,3 @@ module Gitline.Plugin {
 			});
 		}
 	}
-}
