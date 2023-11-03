@@ -5,6 +5,7 @@ import { CommitProvider } from "./CommitProvider";
 import { CommitView } from "./CommitView";
 import { Config, indexToX } from "./Config";
 import { Expandable, HTMLExpandableElement } from "./Expandable";
+import { GithubCommitProvider } from "./plugins/GithubCommitProvider";
 import { LocalGit2JsonProvider } from "./plugins/LocalGit2JsonProvider";
 
 declare var jsgl: any;
@@ -347,6 +348,10 @@ export default class Gitline {
   // Launching
   public fromJSON(jsonFile: string): Gitline {
     return this.fromProvider(new LocalGit2JsonProvider(jsonFile));
+  }
+
+  public fromGitHub(url: string, limit: number, accessToken: string): Gitline {
+    return this.fromProvider(new GithubCommitProvider(url, limit, accessToken));
   }
 
   public fromProvider(commitProvider: CommitProvider): Gitline {

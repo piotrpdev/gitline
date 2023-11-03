@@ -176,7 +176,7 @@
     		
 			$("#myGitlinePanel-1").html("");
     		Gitline.create()
-				.fromProvider(new Gitline.Plugin.GithubCommitProvider(data.url, data.limit, data.accessToken.trim()))
+				.fromGitHub(data.url, data.limit, data.accessToken.trim())
 				.withHeader("Github Repository <a href=\""+data.url+"\">"+data.url+"</a>")
 				.renderTo(document.getElementById("myGitlinePanel-1"));
     		
