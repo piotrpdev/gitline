@@ -1,5 +1,3 @@
-import $ from "jquery";
-
 	export interface HTMLExpandableElement extends HTMLElement {
 		whenShort(innerHTML: string): void;
 		whenFull(innerHTML: string): void;
@@ -16,7 +14,7 @@ import $ from "jquery";
 			extended.whenFull = (innerHTML: string) => {
 				extended.onclick = () => {
 					extended.innerHTML = innerHTML;
-					$(extended).hide().stop().fadeIn("fast");
+					
 					element.classList.add("gitline-expandable-expanded");
 					Expandable.selectElementText(element);
 				};

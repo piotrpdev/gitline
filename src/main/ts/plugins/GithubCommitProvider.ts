@@ -1,6 +1,5 @@
 import moment from "moment";
 import { CommitProvider } from "../CommitProvider";
-import { getJSON, when } from "jquery"
 
 	export interface Branch {
 		name: string;
@@ -43,28 +42,38 @@ import { getJSON, when } from "jquery"
 			// convert to api url and remove trailing /
 			if (url.indexOf("api.github.com") == -1) {
 				url = url.replace(/.*github.com/, "https://api.github.com/repos/").replace(/\/\//g, "/");
-
 			}
-			return url + "/" + api + "?access_token=" + this.accessToken + "&per_page=" + this.limit + "&callback=?&" + params;
+
+			return url + "/" + api + "?per_page=" + this.limit + "&" + params;
 		}
+
+		public fetchGithubJson = (url: string) =>
+			fetch(url, {
+				headers: {
+					"Authorization": "token " + this.accessToken,
+					"Accept": "application/vnd.github.v3+json",
+				}
+			}).then((response) => {
+				if (response.ok) {
+				  return response.json();
+				}
+				throw new Error('Response wasn\'t OK when fetching JSON');
+			})
 
 		public onRequested(url: string) {
 			this.loadForks(url);
 		}
 
 		public loadForks(url: string) {
-			getJSON(this.gitURL(url, "forks")).done((forks) => {
-				if (forks.data.message !== undefined) {
-					this.error("Github API: " + forks.data.message);
-					return;
-				}
-
-				getJSON(this.gitURL(url, "branches")).done((branches) => {
-					this.processBranches(url, branches.data);
-					this.forks = forks.data;
+			this.fetchGithubJson(this.gitURL(url, "forks")).then((forks) => {
+				this.fetchGithubJson(this.gitURL(url, "branches")).then((branches) => {
+					this.processBranches(url, branches);
+					this.forks = forks;
 
 					this.loadBranches();
 				})
+			}).catch((error) => {
+				this.error("Github API: " + error);
 			});
 		}
 
@@ -80,12 +89,12 @@ import { getJSON, when } from "jquery"
 
 		public loadBranches() {
 			var forkRequests = this.forks.map(fork => {
-				return getJSON(this.gitURL(fork.url, "branches"), data => {
+				return this.fetchGithubJson(this.gitURL(fork.url, "branches")).then(branches => {
 					console.debug("loaded branches for " + fork.name);
-					this.processBranches(fork, data.data);
-				})
+					this.processBranches(fork, branches);
+				});
 			});
-			when.apply($, forkRequests).done(() => {
+			Promise.all(forkRequests).then(() => {
 				console.debug("all branches loaded");
 				this.loadCommits();
 			});
@@ -97,14 +106,14 @@ import { getJSON, when } from "jquery"
 				var commit = this.data[b.commit.sha];
 				if (commit == undefined) {
 					commitRequests.push(
-						getJSON(this.gitURL(b.repo, "commits", "sha=" + b.commit.sha), data => {
+						this.fetchGithubJson(this.gitURL(b.repo, "commits", "sha=" + b.commit.sha)).then(commits => {
 							console.debug("loaded commits for " + b.name);
-							this.processCommits(data.data);
+							this.processCommits(commits);
 						}));
 				}
 			});
 
-			when.apply($, commitRequests).done(() => {
+			Promise.all(commitRequests).then(() => {
 				this.process();
 			});
 		}

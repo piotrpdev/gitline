@@ -1,269 +1,305 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
+  <head>
+    <meta charset="utf-8" />
     <title>Gitline GitHub Example</title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
     <script src="../../main/external/jsgl.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-        
-	<style type="text/css">
-		x-config-toggle {
-			position: fixed;
-			top: 2px;
-			right: 2px;
-			font-size: 20px;
-			z-index: 200;
-			cursor: pointer;
-		}
-	
-		x-config {
-			background-color: #f2f2f2;
-			opacity: 0.9;
-			display: block;
-			position: fixed; 
-			right: 0;
-			width: 50%;
-			min-width: 300px;
-			height: 100%;
-			margin-left: 30%;
-			padding-left: 50px;
-			padding-right: 50px;
-			z-index: 100;
-		}
-		x-config-value p {
-			min-width: 500px;
-			width: 100%;
-			display: block;
-			font-size: 16px;
-			//background-color: lightgrey;
-		}
-		x-config-value.active p {
-			background-color: white;
-		}
-		x-config-value input {
-			font-size: 20px;
-			width: 100%
-		}
-		
-		button {
-			margin-top: 30px;
-			font-size: 20px;
-					
-		}
-	</style>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"
+    />
 
-	<style>
-		body {
-			font-family: Verdana, Arial, sans-serif;
-			margin: 0;
-			font-size: 12px;
-		}
-		::-moz-selection {
-			color: white;
-			background: #525252;
-		}
-		::selection {
-			color: white;
-			background: #525252;
-		}
-		gitline-headerpanel {
-			background-color: #f2f2f2;
-			width: 100%;
-			display: block;
-			padding-left: 6px;
-			font-size: 14px;
-			z-index: 5;
-			position: relative;
-			height: 30px;
-			line-height: 30px;
-			border-bottom: 1px solid darkgray;
-			box-sizing: border-box;
-		}
-		gitline-headerpanel a {
-			color: #688094;
-		}
-		gitline-headerpanel a:hover {
-			color: black;
-		}
-		gitline-loadingpanel {
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 100%;
-			width: 100%;
-			box-sizing: border-box;
-			z-index: 4;
-			background-color: #f2f2f2;
-			font-size: 20px;
-			text-align: center;
-			padding-top: 25%;
-			opacity: 0.8;
-		}
-		gitline-textpanel {
-			z-index: 2;
-			min-width: 300px;
-		}
-		gitline-textpanel .gitline-expandable {
-			cursor: pointer;
-		}
-		gitline-textpanel gitline-legend {
-			border-bottom: 1px solid #e0e0e0;
-			min-width: 250px;
-			min-height: 20px;
-			display: block;
-		}
-		gitline-textpanel gitline-legend * {
-			vertical-align: middle;
-			display: inline-block;
-		}
-		gitline-textpanel gitline-legend gitline-subject {
-			color: black;
-			display: inline;
-			line-height: 22px;
-		}
-		gitline-textpanel gitline-legend gitline-subject.has-merges {
-			color: #bbb;
-		}
-		gitline-textpanel gitline-legend gitline-sha {
-			color: #688094;
-			font-size: 13px;
-			padding-right: 5px;
-			font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif;
-		}
-		gitline-textpanel gitline-legend gitline-ref {
-			padding: 1px 3px 1px 3px;
-			color: white;
-			margin-right: 5px;
-		}
-		gitline-textpanel gitline-legend gitline-identity-container {
-			padding-right: 5px;
-		}
-		gitline-textpanel gitline-legend gitline-identity-container gitline-identity {
-			min-width: 20px;
-			min-height: 20px;
-			white-space: nowrap;
-			background-size: 20px 20px !important;
-		}
-		gitline-textpanel gitline-legend gitline-identity-container gitline-identity.gitline-expandable-expanded {
-			padding-left: 24px;
-			font-style: italic;
-			line-height: 20px;
-		}
-		gitline-textpanel gitline-legend gitline-identity-container gitline-identity-datetime {
-			font-style: italic;
-			color: #688094;
-			padding-left: 5px;
-		}
-		gitline-graphicalpanel {
-			z-index: 3;
-			position: absolute !important;
-			display: block;
-		}
-	</style>
+    <style type="text/css">
+      x-config-toggle {
+        position: fixed;
+        top: 2px;
+        right: 2px;
+        font-size: 20px;
+        z-index: 200;
+        cursor: pointer;
+      }
 
-	<!-- <link rel="stylesheet" href="gitline.min.css"/> -->
-	<script src="../../../dist/gitline.umd.cjs"></script>
+      x-config {
+        background-color: #f2f2f2;
+        opacity: 0.9;
+        display: block;
+        position: fixed;
+        right: 0;
+        width: 50%;
+        min-width: 300px;
+        height: 100%;
+        margin-left: 30%;
+        padding-left: 50px;
+        padding-right: 50px;
+        z-index: 100;
+      }
+      x-config-value p {
+        min-width: 500px;
+        width: 100%;
+        display: block;
+        font-size: 16px;
+        //background-color: lightgrey;
+      }
+      x-config-value.active p {
+        background-color: white;
+      }
+      x-config-value input {
+        font-size: 20px;
+        width: 100%;
+      }
+
+      button {
+        margin-top: 30px;
+        font-size: 20px;
+      }
+    </style>
+
+    <style>
+      body {
+        font-family: Verdana, Arial, sans-serif;
+        margin: 0;
+        font-size: 12px;
+      }
+      ::-moz-selection {
+        color: white;
+        background: #525252;
+      }
+      ::selection {
+        color: white;
+        background: #525252;
+      }
+      gitline-headerpanel {
+        background-color: #f2f2f2;
+        width: 100%;
+        display: block;
+        padding-left: 6px;
+        font-size: 14px;
+        z-index: 5;
+        position: relative;
+        height: 30px;
+        line-height: 30px;
+        border-bottom: 1px solid darkgray;
+        box-sizing: border-box;
+      }
+      gitline-headerpanel a {
+        color: #688094;
+      }
+      gitline-headerpanel a:hover {
+        color: black;
+      }
+      gitline-loadingpanel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        z-index: 4;
+        background-color: #f2f2f2;
+        font-size: 20px;
+        text-align: center;
+        padding-top: 25%;
+        opacity: 0.8;
+      }
+      gitline-textpanel {
+        z-index: 2;
+        min-width: 300px;
+      }
+      gitline-textpanel .gitline-expandable {
+        cursor: pointer;
+      }
+      gitline-textpanel gitline-legend {
+        border-bottom: 1px solid #e0e0e0;
+        min-width: 250px;
+        min-height: 20px;
+        display: block;
+      }
+      gitline-textpanel gitline-legend * {
+        vertical-align: middle;
+        display: inline-block;
+      }
+      gitline-textpanel gitline-legend gitline-subject {
+        color: black;
+        display: inline;
+        line-height: 22px;
+      }
+      gitline-textpanel gitline-legend gitline-subject.has-merges {
+        color: #bbb;
+      }
+      gitline-textpanel gitline-legend gitline-sha {
+        color: #688094;
+        font-size: 13px;
+        padding-right: 5px;
+        font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
+          DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+          sans-serif;
+      }
+      gitline-textpanel gitline-legend gitline-ref {
+        padding: 1px 3px 1px 3px;
+        color: white;
+        margin-right: 5px;
+      }
+      gitline-textpanel gitline-legend gitline-identity-container {
+        padding-right: 5px;
+      }
+      gitline-textpanel
+        gitline-legend
+        gitline-identity-container
+        gitline-identity {
+        min-width: 20px;
+        min-height: 20px;
+        white-space: nowrap;
+        background-size: 20px 20px !important;
+      }
+      gitline-textpanel
+        gitline-legend
+        gitline-identity-container
+        gitline-identity.gitline-expandable-expanded {
+        padding-left: 24px;
+        font-style: italic;
+        line-height: 20px;
+      }
+      gitline-textpanel
+        gitline-legend
+        gitline-identity-container
+        gitline-identity-datetime {
+        font-style: italic;
+        color: #688094;
+        padding-left: 5px;
+      }
+      gitline-graphicalpanel {
+        z-index: 3;
+        position: absolute !important;
+        display: block;
+      }
+    </style>
+
+    <!-- <link rel="stylesheet" href="gitline.min.css"/> -->
+    <script src="../../../dist/gitline.umd.cjs"></script>
+  </head>
+  <body>
+    <x-config-toggle><i class="fa fa-cogs"></i></x-config-toggle>
+
+    <x-config>
+      <x-config-value key="url" type="text">
+        <h1>Specify the Repository</h1>
+        The URL of the repository on github. The repository you specify must be
+        publicly available or at least available through the Access Token.
+        Example
+        <a href="https://github.com/blecher-at/gitline"
+          >https://github.com/blecher-at/gitline</a
+        >
+      </x-config-value>
+      <x-config-value key="limit" type="text">
+        <h1>Maximum Amount of Commits to Load</h1>
+        Gitline will only render the most frequent commits. please configure a
+        resonable amount of commits, or your tokens limit will be exceeded and
+        rendering times will suffer.
+      </x-config-value>
+      <!-- <x-config-value key="withForks" type="boolean"></x-config-value>-->
+      <x-config-value key="accessToken" type="password">
+        <h1>Authenticate</h1>
+        Gitline requires an API token, generated by you, in order to access your
+        repository. If your repository is public, no permissions need to be
+        granted. In case of a private repository, please grant read access to
+        the repository. You can generate a token in your github settings:
+        <a href="https://github.com/settings/tokens/new" target="_blank"
+          >https://github.com/settings/tokens/new</a
+        >.
+      </x-config-value>
+
+      <button onclick="display()">Okay</button>
+    </x-config>
+
+    <div id="myGitlinePanel-1"></div>
 
     <script>
-	    var data = {url: "https://github.com/blecher-at/gitline", limit: 100, accessToken: ""};
-	    
-	    function toggleConfig() {
-	    	$("x-config").toggle(); 
-	    }
-    	function display() {
-    		toggleConfig();
-    		
-			$("#myGitlinePanel-1").html("");
-    		Gitline.create()
-				.fromGitHub(data.url, data.limit, data.accessToken.trim())
-				.withHeader("Github Repository <a href=\""+data.url+"\">"+data.url+"</a>")
-				.renderTo(document.getElementById("myGitlinePanel-1"));
-    		
-    	}
-    	
-    	function configure() {
-    		$("x-config").show();
-    	}
-    	
-        $(function () {
-    		if(window.localStorage) {
-    			try {
-    			var localStorage = JSON.parse(window.localStorage.getItem("gitline-config"));
-    			data = $.extend(data, localStorage);
-    			} catch (e) {
-    				console.error(e);
-    			}
-    		}
+      var data = {
+        url: "https://github.com/blecher-at/gitline",
+        limit: 100,
+        accessToken: "",
+      };
 
-    		$("x-config-toggle").click(function() {
-    			toggleConfig();
-    		});
-    		
-    		//$("x-config").hide();
-        	// Render it
-        	$("x-config x-config-value").each(function() {
-        		var desc = $(this).html();
-        		var id = $(this).attr("key");
-        		var type = $(this).attr("type");
-        		console.debug(id, this);
-        		$(this).html("");
-        		
-        		var para = $("<p></p>");
-        		para.html(desc);
-        		
-        		
-       			var input = $("<input type=\""+type+"\" id="+id+" >");
-        		$(input).val(data[$(this).attr("key")]);
-        		input.change(onchange);
-        		
-        		$(this).append(para);
-        		$(this).append(input);
-        	});
-        	
-        	function onchange() {
-				data[$(this).parent("x-config-value").attr("key")] = $(this).val();
-				window.localStorage.setItem("gitline-config", JSON.stringify(data));
-				
-				//display();
-        	}
-        	
-        	if(data.accessToken !== "") {
-        		display();
-        	} else {
-        		configure();
-        	}
-        	
+      function toggleConfig() {
+		var config = document.querySelector("x-config");
+
+		if (config.style.display === "none") {
+			config.style.display = "block";
+		} else {
+			config.style.display = "none";
+		}
+      }
+
+      function display() {
+        toggleConfig();
+
+        document.querySelector("#myGitlinePanel-1").innerHTML = "";
+
+        Gitline.create()
+          .fromGitHub(data.url, data.limit, data.accessToken.trim())
+          .withHeader(
+            'Github Repository <a href="' + data.url + '">' + data.url + "</a>"
+          )
+          .renderTo(document.getElementById("myGitlinePanel-1"));
+      }
+
+      function configure() {
+        var config = document.querySelector("x-config");
+
+		config.style.display = "block";
+      }
+
+      (function () {
+        if (window.localStorage) {
+          try {
+            const localStorage = JSON.parse(
+              window.localStorage.getItem("gitline-config")
+            );
+            data = { ...data, ...localStorage }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        document.querySelector("x-config-toggle").addEventListener("click", function () {
+          toggleConfig();
         });
+
+        //$("x-config").hide();
+        // Render it
+        document.querySelectorAll("x-config x-config-value").forEach(function (_element) {
+		  const element = _element.cloneNode(true);
+
+          const id = element.getAttribute("key");
+          console.debug(id, element);
+
+          const para = document.createElement("p");
+		  para.innerHTML = element.innerHTML;
+
+          const input = document.createElement("input");
+		  input.id = id;
+		  input.type = element.getAttribute("type");
+		  input.value = data[element.getAttribute("key")];
+          input.addEventListener("change", onchange);
+
+		  _element.innerHTML = "";
+		  _element.append(para, input);
+        });
+
+        function onchange(event) {
+          data[event.target.parentNode.getAttribute("key")] = event.target.value;
+          window.localStorage.setItem("gitline-config", JSON.stringify(data));
+
+          //display();
+        }
+
+        if (data.accessToken !== "") {
+          display();
+        } else {
+          configure();
+        }
+      })();
     </script>
-
-</head>
-<body>
-
-<x-config-toggle><i class="fa fa-cogs"></i></x-config-toggle>
-
-<x-config>
-	<x-config-value key="url" type="text">
-		<h1>Specify the Repository</h1>
-		The URL of the repository on github. The repository you specify must be publicly available or at least available through the Access Token. 
-		Example <a href="https://github.com/blecher-at/gitline">https://github.com/blecher-at/gitline</a>
-	</x-config-value>
-	<x-config-value key="limit" type="text">
-		<h1>Maximum Amount of Commits to Load</h1>
-		Gitline will only render the most frequent commits. please configure a resonable amount of commits, or your tokens limit will be exceeded and rendering times will suffer. 
-	</x-config-value>	
-	<!-- <x-config-value key="withForks" type="boolean"></x-config-value>-->
-	<x-config-value key="accessToken" type="password">
-		<h1>Authenticate </h1>
-		Gitline requires an API token, generated by you, in order to access your repository. If your repository is public, no permissions need to be granted. In case of a private repository, please grant read access to the repository.
-		You can generate a token in your github settings: <a href="https://github.com/settings/tokens/new" target="_blank">https://github.com/settings/tokens/new</a>. 
-	</x-config-value>
-	
-	<button onclick="display()">Okay</button>
-</x-config>
-
-<div id="myGitlinePanel-1">
-	
-</div>
-</body>
+  </body>
 </html>
