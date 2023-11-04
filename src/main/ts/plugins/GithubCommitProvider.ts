@@ -49,7 +49,7 @@ import { CommitProvider } from "../CommitProvider";
 		public fetchGithubJson = (url: string) =>
 			fetch(url, {
 				headers: {
-					"Authorization": "token " + this.accessToken,
+					...(this.accessToken && {"Authorization": `token ${this.accessToken}`}),
 					"Accept": "application/vnd.github.v3+json",
 				}
 			}).then((response) => {
