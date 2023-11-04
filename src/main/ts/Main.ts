@@ -257,10 +257,10 @@ export default class Gitline {
       document.createElement("gitline-identity-datetime")
     );
     datetime.classList.add(type + "-datetime");
-    var fullDate = id.date.format("YYYY-MM-DD HH:mm");
+    var fullDate = id.date.toISOString().slice(0, 16).replace('T',' ')
     datetime.setAttribute("title", fullDate);
     datetime.whenFull(fullDate);
-    datetime.whenShort(id.date.format("HH:mm"));
+    datetime.whenShort(id.date.toISOString().slice(11, 16));
 
     container.appendChild(identity);
     container.appendChild(datetime);

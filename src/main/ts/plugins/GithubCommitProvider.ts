@@ -1,4 +1,3 @@
-import moment from "moment";
 import { CommitProvider } from "../CommitProvider";
 
 	export interface Branch {
@@ -128,13 +127,13 @@ import { CommitProvider } from "../CommitProvider";
 				});
 				c.authorname = data.commit.author.name;
 				c.authoremail = data.commit.author.email;
-				c.authordate = moment(data.commit.author.date).unix();
-				c.authortimestamp = moment(data.commit.author.date).valueOf();
+				c.authordate = new Date(data.commit.author.date).valueOf() / 1000;
+				c.authortimestamp = new Date(data.commit.author.date).valueOf();
 
 				c.committername = data.commit.committer.name;
 				c.committeremail = data.commit.committer.email;
-				c.committerdate = moment(data.commit.committer.date).unix();
-				c.committertimestamp = moment(data.commit.committer.date).valueOf();
+				c.committerdate = new Date(data.commit.committer.date).valueOf() / 1000;
+				c.committertimestamp = new Date(data.commit.committer.date).valueOf();
 
 				c.subject = data.commit.message;
 				c.body = ""; // Todo: where to get this?

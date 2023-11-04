@@ -1,4 +1,3 @@
-import moment from "moment";
 import { Branch } from "./Branch";
 import { CommitView } from "./CommitView";
 import { indexToX } from "./Config";
@@ -8,7 +7,7 @@ import Gitline from "./Main";
 	export class Identity {
 		public image: string; // optional
 
-		public constructor(public name: string, public email: string, public date: moment.Moment) {
+		public constructor(public name: string, public email: string, public date: Date) {
 		}
 	}
 
@@ -54,8 +53,8 @@ import Gitline from "./Main";
 			this.subject = data.subject;
 			this.indexY = container.maxIndexY++;
 
-			this.committer = new Identity(this.data.committername, this.data.committeremail, moment.unix(this.data.committerdate));
-			this.author = new Identity(this.data.authorname, this.data.authoremail, moment.unix(this.data.authordate));
+			this.committer = new Identity(this.data.committername, this.data.committeremail, new Date(this.data.committerdate * 1000));
+			this.author = new Identity(this.data.authorname, this.data.authoremail, new Date(this.data.authordate * 1000));
 		}
 
 		public getShortSha(): string {
