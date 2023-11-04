@@ -26,7 +26,7 @@ see [/docker-image](https://github.com/piotrpdev/gitline/tree/master/docker-imag
 - Install Node.js
 - Install dependencies: `npm install`
 - Build the library: `npm run build`
-- View the examples: `npm run dev` and go to `localhost:5173/src/demo/html/` in the browser
+- View the examples: `npm run dev:demo`
 
 ## Creating sample data
 
