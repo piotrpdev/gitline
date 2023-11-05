@@ -1,6 +1,8 @@
-![gitline sample](./.github/img/gitline.png)
+![gitline example](./.github/img/gitline-example.png)
 
 # gitline - A git history to HTML renderer implemented in TypeScript
+
+<img align="right" width="200px" src="https://github.com/piotrpdev/gitline/assets/99439005/ce6723a1-d9fc-47a7-aa06-84552df2669f" />
 
 > [!NOTE]
 > This is a fork of the original project by [blecher-at](https://github.com/blecher-at/gitline). This fork updates the project to a more modern approach and removes a lot of libraries that are no longer needed.

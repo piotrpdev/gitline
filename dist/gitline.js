@@ -686,7 +686,7 @@ class mt {
     n(this, "avatars", [this.avatar_gravatar]);
   }
   avatar_gravatar(t) {
-    return "http://www.gravatar.com/avatar/" + ft(t.toLowerCase()) + "?s=20&d=mm";
+    return "https://www.gravatar.com/avatar/" + ft(t.toLowerCase()) + "?s=20&d=mm";
   }
 }
 class V {
