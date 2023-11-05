@@ -1,9 +1,9 @@
 {
-  "name": "gitline",
+  "name": "@piotrpdev/gitline",
   "version": "0.0.2",
   "description": "Graphical git UI",
   "author": "Piotr Placzek <piotrpdev@gmail.com>",
-  "private": true,
+  "license": "AGPL-3.0-only",
   "keywords": [
     "git",
     "ui",
@@ -25,9 +25,13 @@
     "vite-plugin-static-copy": "^0.17.0",
     "vitest": "^0.34.6"
   },
+  "homepage": "https://github.com/piotrpdev/gitline#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/piotrpdev/gitline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/piotrpdev/gitline/issues"
   },
   "files": [
     "dist"
