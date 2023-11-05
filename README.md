@@ -27,12 +27,13 @@ see [/docker-image](https://github.com/piotrpdev/gitline/tree/master/docker-imag
 - Install dependencies: `npm install`
 - Build the library: `npm run build`
 - View the examples: `npm run dev:demo`
+- Test the library: `npm run test`
 
 ## Creating sample data
 
 - Install [git2json](https://github.com/blecher-at/git2json)
 - run `git json > myfile.json` - in a cronjob presumably
-- point `src/index.html` to the newly created JSON file
+- point `src/demo/index.html` to the newly created JSON file
 
 ## Imports / Third party
 

@@ -15,24 +15,24 @@
     "dev:demo": "vite --config vite-demo.config.ts",
     "build": "tsc && vite build",
     "build:demo": "vite build --config vite-demo.config.ts",
-    "preview": "vite preview"
+    "test": "vitest --dir src/test"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.3",
     "@types/node": "^20.8.10",
-    "chai": "^3.4.1",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
-    "vite-plugin-static-copy": "^0.17.0"
+    "vite-plugin-static-copy": "^0.17.0",
+    "vitest": "^0.34.6"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/piotrpdev/gitline.git"
   },
-  "type": "module",
   "files": [
     "dist"
   ],
+  "type": "module",
   "main": "./dist/gitline.umd.cjs",
   "module": "./dist/gitline.js",
   "exports": {
