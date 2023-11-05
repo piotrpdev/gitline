@@ -40,7 +40,7 @@ import { CommitProvider } from "../CommitProvider";
 
 			// convert to api url and remove trailing /
 			if (url.indexOf("api.github.com") == -1) {
-				url = url.replace(/.*github.com/, "https://api.github.com/repos/").replace(/\/\//g, "/");
+				url = url.replace(/.*github.com\//, "https://api.github.com/repos/");
 			}
 
 			return url + "/" + api + "?per_page=" + this.limit + "&" + params;
