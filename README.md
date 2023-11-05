@@ -37,7 +37,7 @@ see [/docker-image](https://github.com/piotrpdev/gitline/tree/master/docker-imag
 ## Imports / Third party
 
 - Programming language: [TypeScript](http://www.typescriptlang.org/)
-- SVG Rendering: [Overv/JSGL](https://github.com/Overv/JSGL)  
+- SVG Rendering: [JSGL](https://github.com/jsgl/repo)  
   - Uses [jQuery](https://jquery.org/)
 - Hash Generation: [Crypto JS](https://github.com/brix/crypto-js)
 

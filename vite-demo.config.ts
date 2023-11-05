@@ -28,10 +28,6 @@ export default defineConfig({
         {
             src: normalizePath(path.join(__dirname, "src", "test", "data", "*")),
             dest: "assets/data"
-        },
-        {
-            src: normalizePath(path.join(__dirname, "src", "external", "*")),
-            dest: "assets/external"
         }
       ]
     })

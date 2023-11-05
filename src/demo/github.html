@@ -5,12 +5,12 @@
     <title>Gitline GitHub Example</title>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
-    <script src="/assets/external/jsgl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jsgl/repo@6231386/jsgl.min.js"></script>
 
     <style type="text/css">
       x-config-toggle {
         position: fixed;
-        top: 2px;
+        top: 17px;
         right: 2px;
         font-size: 20px;
         z-index: 200;
@@ -72,7 +72,7 @@
       }
     </style>
 
-    <link rel="stylesheet" href="/assets/lib/gitline.css"/>
+    <link rel="stylesheet" href="/assets/lib/gitline.css" />
     <script src="/assets/lib/gitline.umd.cjs"></script>
   </head>
   <body>
@@ -82,7 +82,7 @@
       <a href="github.html">GitHub</a>
     </header>
 
-    <x-config-toggle><img src="/assets/svg/settings.svg"/></x-config-toggle>
+    <x-config-toggle><img src="/assets/svg/settings.svg" /></x-config-toggle>
 
     <x-config>
       <x-config-value key="url" type="text">
@@ -125,13 +125,13 @@
       };
 
       function toggleConfig() {
-		var config = document.querySelector("x-config");
+        var config = document.querySelector("x-config");
 
-		if (config.style.display === "none") {
-			config.style.display = "block";
-		} else {
-			config.style.display = "none";
-		}
+        if (config.style.display === "none") {
+          config.style.display = "block";
+        } else {
+          config.style.display = "none";
+        }
       }
 
       function display() {
@@ -150,7 +150,7 @@
       function configure() {
         var config = document.querySelector("x-config");
 
-		config.style.display = "block";
+        config.style.display = "block";
       }
 
       (function () {
@@ -159,39 +159,44 @@
             const localStorage = JSON.parse(
               window.localStorage.getItem("gitline-config")
             );
-            data = { ...data, ...localStorage }
+            data = { ...data, ...localStorage };
           } catch (e) {
             console.error(e);
           }
         }
 
-        document.querySelector("x-config-toggle").addEventListener("click", function () {
-          toggleConfig();
-        });
+        document
+          .querySelector("x-config-toggle")
+          .addEventListener("click", function () {
+            toggleConfig();
+          });
 
         //$("x-config").hide();
         // Render it
-        document.querySelectorAll("x-config x-config-value").forEach(function (_element) {
-		  const element = _element.cloneNode(true);
+        document
+          .querySelectorAll("x-config x-config-value")
+          .forEach(function (_element) {
+            const element = _element.cloneNode(true);
 
-          const id = element.getAttribute("key");
-          console.debug(id, element);
+            const id = element.getAttribute("key");
+            console.debug(id, element);
 
-          const para = document.createElement("p");
-		  para.innerHTML = element.innerHTML;
+            const para = document.createElement("p");
+            para.innerHTML = element.innerHTML;
 
-          const input = document.createElement("input");
-		  input.id = id;
-		  input.type = element.getAttribute("type");
-		  input.value = data[element.getAttribute("key")];
-          input.addEventListener("change", onchange);
+            const input = document.createElement("input");
+            input.id = id;
+            input.type = element.getAttribute("type");
+            input.value = data[element.getAttribute("key")];
+            input.addEventListener("change", onchange);
 
-		  _element.innerHTML = "";
-		  _element.append(para, input);
-        });
+            _element.innerHTML = "";
+            _element.append(para, input);
+          });
 
         function onchange(event) {
-          data[event.target.parentNode.getAttribute("key")] = event.target.value;
+          data[event.target.parentNode.getAttribute("key")] =
+            event.target.value;
           window.localStorage.setItem("gitline-config", JSON.stringify(data));
 
           //display();
