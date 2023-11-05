@@ -1,64 +1,88 @@
 var it = Object.defineProperty;
-var rt = (v, t, e) => t in v ? it(v, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : v[t] = e;
-var n = (v, t, e) => (rt(v, typeof t != "symbol" ? t + "" : t, e), e);
+var rt = (v, e, t) => e in v ? it(v, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : v[e] = t;
+var n = (v, e, t) => (rt(v, typeof e != "symbol" ? e + "" : e, t), t);
 class U {
-  constructor(t, e, i, s, m) {
+  constructor(e, t, i, r, f) {
     n(this, "label");
     n(this, "data");
     n(this, "callback");
     n(this, "index");
     n(this, "of");
-    this.label = t, this.data = e, this.callback = i, this.index = s, this.of = m;
+    this.label = e, this.data = t, this.callback = i, this.index = r, this.of = f;
   }
 }
 class st {
-  constructor(t) {
+  constructor(e) {
     n(this, "element");
-    n(this, "items", []);
+    n(this, "queue", []);
+    // Now storing a queue of functions returning promises.
     n(this, "suspended", !1);
-    this.element = t;
+    this.element = e;
   }
-  /** do this async, display the label and the data */
-  then(t, e, i) {
-    return this.thenSingle(t, () => {
-      for (var s = e(), m = s.length - 1; m >= 0; m--)
-        this.items.unshift(new U(t, s[m], i, m, s.length));
-    }), this;
+  then(e, t, i) {
+    return this.queue.push(() => this.processBatch(e, t, i)), this;
   }
-  thenSingle(t, e) {
-    return this.items.push(new U(t, null, e, 0, 1)), this;
+  thenSingle(e, t) {
+    return this.queue.push(() => this.processSingle(e, t)), this;
   }
-  start(t = !0) {
-    t && (this.element.hidden = !1), this.next();
+  processSingle(e, t) {
+    const i = new U(e, null, t, 0, 1);
+    return this.showStatus(i), new Promise((r, f) => {
+      try {
+        t(), r();
+      } catch (y) {
+        f(y);
+      }
+    });
   }
-  next() {
-    var t = this.items.shift();
-    t !== void 0 ? t.index % 50 === 0 ? (this.showStatus(t), window.setTimeout(() => {
-      console.debug("executing " + t.label + " (" + t.index + "/" + t.of + ")"), this.execute(t);
-    }, 0)) : this.execute(t) : this.element.hidden = !0;
+  processBatch(e, t, i) {
+    const r = t(), f = r.map((y, C) => {
+      const P = new U(e, y, i, C, r.length);
+      return this.processItem(P, i);
+    });
+    return Promise.all(f).then(() => {
+    });
+  }
+  processItem(e, t) {
+    return this.showStatus(e), new Promise((i, r) => {
+      try {
+        t(e.data), i();
+      } catch (f) {
+        r(f);
+      }
+    });
+  }
+  async processQueue() {
+    for (; this.queue.length > 0 && !this.suspended; ) {
+      const e = this.queue.shift();
+      if (e)
+        try {
+          await e();
+        } catch (t) {
+          this.error(t);
+          break;
+        }
+    }
+    this.queue.length === 0 && (this.element.hidden = !0);
+  }
+  start(e = !0) {
+    return e && this.suspended === !1 && (this.element.hidden = !1), this.processQueue();
   }
   suspend() {
     this.suspended = !0;
   }
   resume() {
-    this.suspended = !1, this.next();
+    this.suspended = !1, this.start(!1);
   }
-  showStatus(t) {
-    this.element.innerHTML = t.label;
+  showStatus(e) {
+    this.element.innerHTML = `${e.label} (${e.index + 1}/${e.of})`;
   }
-  execute(t) {
-    try {
-      t.callback(t.data), this.suspended || this.next();
-    } catch (e) {
-      this.error(e);
-    }
-  }
-  error(t) {
-    console.error(t), this.element.innerHTML = t, this.suspend();
+  error(e) {
+    console.error(e), this.element.innerHTML = "Error: " + e.toString(), this.suspend();
   }
 }
 class K {
-  constructor(t, e, i) {
+  constructor(e, t, i) {
     n(this, "specifity");
     n(this, "start");
     n(this, "origin");
@@ -72,35 +96,35 @@ class K {
     n(this, "lane");
     n(this, "parent");
     n(this, "anonymous");
-    this.ref = t, this.commit = e, this.specifity = i, this.shortname = t.split("@")[0], this.category = this.shortname.substring(0, this.shortname.lastIndexOf("/"));
+    this.ref = e, this.commit = t, this.specifity = i, this.shortname = e.split("@")[0], this.category = this.shortname.substring(0, this.shortname.lastIndexOf("/"));
   }
 }
-var Y = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
+var I = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
 function nt(v) {
   return v && v.__esModule && Object.prototype.hasOwnProperty.call(v, "default") ? v.default : v;
 }
 function at(v) {
   if (v.__esModule)
     return v;
-  var t = v.default;
-  if (typeof t == "function") {
-    var e = function i() {
-      return this instanceof i ? Reflect.construct(t, arguments, this.constructor) : t.apply(this, arguments);
+  var e = v.default;
+  if (typeof e == "function") {
+    var t = function i() {
+      return this instanceof i ? Reflect.construct(e, arguments, this.constructor) : e.apply(this, arguments);
     };
-    e.prototype = t.prototype;
+    t.prototype = e.prototype;
   } else
-    e = {};
-  return Object.defineProperty(e, "__esModule", { value: !0 }), Object.keys(v).forEach(function(i) {
-    var s = Object.getOwnPropertyDescriptor(v, i);
-    Object.defineProperty(e, i, s.get ? s : {
+    t = {};
+  return Object.defineProperty(t, "__esModule", { value: !0 }), Object.keys(v).forEach(function(i) {
+    var r = Object.getOwnPropertyDescriptor(v, i);
+    Object.defineProperty(t, i, r.get ? r : {
       enumerable: !0,
       get: function() {
         return v[i];
       }
     });
-  }), e;
+  }), t;
 }
-var Z = { exports: {} };
+var Q = { exports: {} };
 function ot(v) {
   throw new Error('Could not dynamically require "' + v + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
 }
@@ -111,39 +135,39 @@ const ht = {}, ct = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
 }, Symbol.toStringTag, { value: "Module" })), lt = /* @__PURE__ */ at(ct);
 var $;
 function dt() {
-  return $ || ($ = 1, function(v, t) {
-    (function(e, i) {
+  return $ || ($ = 1, function(v, e) {
+    (function(t, i) {
       v.exports = i();
-    })(Y, function() {
-      var e = e || function(i, s) {
-        var m;
-        if (typeof window < "u" && window.crypto && (m = window.crypto), typeof self < "u" && self.crypto && (m = self.crypto), typeof globalThis < "u" && globalThis.crypto && (m = globalThis.crypto), !m && typeof window < "u" && window.msCrypto && (m = window.msCrypto), !m && typeof Y < "u" && Y.crypto && (m = Y.crypto), !m && typeof ot == "function")
+    })(I, function() {
+      var t = t || function(i, r) {
+        var f;
+        if (typeof window < "u" && window.crypto && (f = window.crypto), typeof self < "u" && self.crypto && (f = self.crypto), typeof globalThis < "u" && globalThis.crypto && (f = globalThis.crypto), !f && typeof window < "u" && window.msCrypto && (f = window.msCrypto), !f && typeof I < "u" && I.crypto && (f = I.crypto), !f && typeof ot == "function")
           try {
-            m = lt;
+            f = lt;
           } catch {
           }
-        var C = function() {
-          if (m) {
-            if (typeof m.getRandomValues == "function")
+        var y = function() {
+          if (f) {
+            if (typeof f.getRandomValues == "function")
               try {
-                return m.getRandomValues(new Uint32Array(1))[0];
+                return f.getRandomValues(new Uint32Array(1))[0];
               } catch {
               }
-            if (typeof m.randomBytes == "function")
+            if (typeof f.randomBytes == "function")
               try {
-                return m.randomBytes(4).readInt32LE();
+                return f.randomBytes(4).readInt32LE();
               } catch {
               }
           }
           throw new Error("Native crypto module could not be used to get secure random number.");
-        }, S = Object.create || function() {
-          function r() {
+        }, C = Object.create || function() {
+          function s() {
           }
           return function(d) {
             var u;
-            return r.prototype = d, u = new r(), r.prototype = null, u;
+            return s.prototype = d, u = new s(), s.prototype = null, u;
           };
-        }(), D = {}, l = D.lib = {}, k = l.Base = function() {
+        }(), P = {}, l = P.lib = {}, k = l.Base = function() {
           return {
             /**
              * Creates a new object that inherits from this object.
@@ -163,9 +187,9 @@ function dt() {
              *         }
              *     });
              */
-            extend: function(r) {
-              var d = S(this);
-              return r && d.mixIn(r), (!d.hasOwnProperty("init") || this.init === d.init) && (d.init = function() {
+            extend: function(s) {
+              var d = C(this);
+              return s && d.mixIn(s), (!d.hasOwnProperty("init") || this.init === d.init) && (d.init = function() {
                 d.$super.init.apply(this, arguments);
               }), d.init.prototype = d, d.$super = this, d;
             },
@@ -182,8 +206,8 @@ function dt() {
              *     var instance = MyType.create();
              */
             create: function() {
-              var r = this.extend();
-              return r.init.apply(r, arguments), r;
+              var s = this.extend();
+              return s.init.apply(s, arguments), s;
             },
             /**
              * Initializes a newly created object.
@@ -210,10 +234,10 @@ function dt() {
              *         field: 'value'
              *     });
              */
-            mixIn: function(r) {
-              for (var d in r)
-                r.hasOwnProperty(d) && (this[d] = r[d]);
-              r.hasOwnProperty("toString") && (this.toString = r.toString);
+            mixIn: function(s) {
+              for (var d in s)
+                s.hasOwnProperty(d) && (this[d] = s[d]);
+              s.hasOwnProperty("toString") && (this.toString = s.toString);
             },
             /**
              * Creates a copy of this object.
@@ -228,7 +252,7 @@ function dt() {
               return this.init.prototype.extend(this);
             }
           };
-        }(), x = l.WordArray = k.extend({
+        }(), S = l.WordArray = k.extend({
           /**
            * Initializes a newly created word array.
            *
@@ -241,8 +265,8 @@ function dt() {
            *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607]);
            *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607], 6);
            */
-          init: function(r, d) {
-            r = this.words = r || [], d != s ? this.sigBytes = d : this.sigBytes = r.length * 4;
+          init: function(s, d) {
+            s = this.words = s || [], d != r ? this.sigBytes = d : this.sigBytes = s.length * 4;
           },
           /**
            * Converts this word array to a string.
@@ -257,8 +281,8 @@ function dt() {
            *     var string = wordArray.toString();
            *     var string = wordArray.toString(CryptoJS.enc.Utf8);
            */
-          toString: function(r) {
-            return (r || P).stringify(this);
+          toString: function(s) {
+            return (s || D).stringify(this);
           },
           /**
            * Concatenates a word array to this word array.
@@ -271,12 +295,12 @@ function dt() {
            *
            *     wordArray1.concat(wordArray2);
            */
-          concat: function(r) {
-            var d = this.words, u = r.words, g = this.sigBytes, w = r.sigBytes;
+          concat: function(s) {
+            var d = this.words, u = s.words, g = this.sigBytes, w = s.sigBytes;
             if (this.clamp(), g % 4)
-              for (var y = 0; y < w; y++) {
-                var L = u[y >>> 2] >>> 24 - y % 4 * 8 & 255;
-                d[g + y >>> 2] |= L << 24 - (g + y) % 4 * 8;
+              for (var x = 0; x < w; x++) {
+                var L = u[x >>> 2] >>> 24 - x % 4 * 8 & 255;
+                d[g + x >>> 2] |= L << 24 - (g + x) % 4 * 8;
               }
             else
               for (var E = 0; E < w; E += 4)
@@ -291,8 +315,8 @@ function dt() {
            *     wordArray.clamp();
            */
           clamp: function() {
-            var r = this.words, d = this.sigBytes;
-            r[d >>> 2] &= 4294967295 << 32 - d % 4 * 8, r.length = i.ceil(d / 4);
+            var s = this.words, d = this.sigBytes;
+            s[d >>> 2] &= 4294967295 << 32 - d % 4 * 8, s.length = i.ceil(d / 4);
           },
           /**
            * Creates a copy of this word array.
@@ -304,8 +328,8 @@ function dt() {
            *     var clone = wordArray.clone();
            */
           clone: function() {
-            var r = k.clone.call(this);
-            return r.words = this.words.slice(0), r;
+            var s = k.clone.call(this);
+            return s.words = this.words.slice(0), s;
           },
           /**
            * Creates a word array filled with random bytes.
@@ -320,12 +344,12 @@ function dt() {
            *
            *     var wordArray = CryptoJS.lib.WordArray.random(16);
            */
-          random: function(r) {
-            for (var d = [], u = 0; u < r; u += 4)
-              d.push(C());
-            return new x.init(d, r);
+          random: function(s) {
+            for (var d = [], u = 0; u < s; u += 4)
+              d.push(y());
+            return new S.init(d, s);
           }
-        }), b = D.enc = {}, P = b.Hex = {
+        }), b = P.enc = {}, D = b.Hex = {
           /**
            * Converts a word array to a hex string.
            *
@@ -339,10 +363,10 @@ function dt() {
            *
            *     var hexString = CryptoJS.enc.Hex.stringify(wordArray);
            */
-          stringify: function(r) {
-            for (var d = r.words, u = r.sigBytes, g = [], w = 0; w < u; w++) {
-              var y = d[w >>> 2] >>> 24 - w % 4 * 8 & 255;
-              g.push((y >>> 4).toString(16)), g.push((y & 15).toString(16));
+          stringify: function(s) {
+            for (var d = s.words, u = s.sigBytes, g = [], w = 0; w < u; w++) {
+              var x = d[w >>> 2] >>> 24 - w % 4 * 8 & 255;
+              g.push((x >>> 4).toString(16)), g.push((x & 15).toString(16));
             }
             return g.join("");
           },
@@ -359,10 +383,10 @@ function dt() {
            *
            *     var wordArray = CryptoJS.enc.Hex.parse(hexString);
            */
-          parse: function(r) {
-            for (var d = r.length, u = [], g = 0; g < d; g += 2)
-              u[g >>> 3] |= parseInt(r.substr(g, 2), 16) << 24 - g % 8 * 4;
-            return new x.init(u, d / 2);
+          parse: function(s) {
+            for (var d = s.length, u = [], g = 0; g < d; g += 2)
+              u[g >>> 3] |= parseInt(s.substr(g, 2), 16) << 24 - g % 8 * 4;
+            return new S.init(u, d / 2);
           }
         }, _ = b.Latin1 = {
           /**
@@ -378,10 +402,10 @@ function dt() {
            *
            *     var latin1String = CryptoJS.enc.Latin1.stringify(wordArray);
            */
-          stringify: function(r) {
-            for (var d = r.words, u = r.sigBytes, g = [], w = 0; w < u; w++) {
-              var y = d[w >>> 2] >>> 24 - w % 4 * 8 & 255;
-              g.push(String.fromCharCode(y));
+          stringify: function(s) {
+            for (var d = s.words, u = s.sigBytes, g = [], w = 0; w < u; w++) {
+              var x = d[w >>> 2] >>> 24 - w % 4 * 8 & 255;
+              g.push(String.fromCharCode(x));
             }
             return g.join("");
           },
@@ -398,12 +422,12 @@ function dt() {
            *
            *     var wordArray = CryptoJS.enc.Latin1.parse(latin1String);
            */
-          parse: function(r) {
-            for (var d = r.length, u = [], g = 0; g < d; g++)
-              u[g >>> 2] |= (r.charCodeAt(g) & 255) << 24 - g % 4 * 8;
-            return new x.init(u, d);
+          parse: function(s) {
+            for (var d = s.length, u = [], g = 0; g < d; g++)
+              u[g >>> 2] |= (s.charCodeAt(g) & 255) << 24 - g % 4 * 8;
+            return new S.init(u, d);
           }
-        }, f = b.Utf8 = {
+        }, m = b.Utf8 = {
           /**
            * Converts a word array to a UTF-8 string.
            *
@@ -417,9 +441,9 @@ function dt() {
            *
            *     var utf8String = CryptoJS.enc.Utf8.stringify(wordArray);
            */
-          stringify: function(r) {
+          stringify: function(s) {
             try {
-              return decodeURIComponent(escape(_.stringify(r)));
+              return decodeURIComponent(escape(_.stringify(s)));
             } catch {
               throw new Error("Malformed UTF-8 data");
             }
@@ -437,8 +461,8 @@ function dt() {
            *
            *     var wordArray = CryptoJS.enc.Utf8.parse(utf8String);
            */
-          parse: function(r) {
-            return _.parse(unescape(encodeURIComponent(r)));
+          parse: function(s) {
+            return _.parse(unescape(encodeURIComponent(s)));
           }
         }, p = l.BufferedBlockAlgorithm = k.extend({
           /**
@@ -449,7 +473,7 @@ function dt() {
            *     bufferedBlockAlgorithm.reset();
            */
           reset: function() {
-            this._data = new x.init(), this._nDataBytes = 0;
+            this._data = new S.init(), this._nDataBytes = 0;
           },
           /**
            * Adds new data to this block algorithm's buffer.
@@ -461,8 +485,8 @@ function dt() {
            *     bufferedBlockAlgorithm._append('data');
            *     bufferedBlockAlgorithm._append(wordArray);
            */
-          _append: function(r) {
-            typeof r == "string" && (r = f.parse(r)), this._data.concat(r), this._nDataBytes += r.sigBytes;
+          _append: function(s) {
+            typeof s == "string" && (s = m.parse(s)), this._data.concat(s), this._nDataBytes += s.sigBytes;
           },
           /**
            * Processes available data blocks.
@@ -478,16 +502,16 @@ function dt() {
            *     var processedData = bufferedBlockAlgorithm._process();
            *     var processedData = bufferedBlockAlgorithm._process(!!'flush');
            */
-          _process: function(r) {
-            var d, u = this._data, g = u.words, w = u.sigBytes, y = this.blockSize, L = y * 4, E = w / L;
-            r ? E = i.ceil(E) : E = i.max((E | 0) - this._minBufferSize, 0);
-            var R = E * y, H = i.min(R * 4, w);
+          _process: function(s) {
+            var d, u = this._data, g = u.words, w = u.sigBytes, x = this.blockSize, L = x * 4, E = w / L;
+            s ? E = i.ceil(E) : E = i.max((E | 0) - this._minBufferSize, 0);
+            var R = E * x, H = i.min(R * 4, w);
             if (R) {
-              for (var O = 0; O < R; O += y)
+              for (var O = 0; O < R; O += x)
                 this._doProcessBlock(g, O);
               d = g.splice(0, R), u.sigBytes -= H;
             }
-            return new x.init(d, H);
+            return new S.init(d, H);
           },
           /**
            * Creates a copy of this object.
@@ -499,8 +523,8 @@ function dt() {
            *     var clone = bufferedBlockAlgorithm.clone();
            */
           clone: function() {
-            var r = k.clone.call(this);
-            return r._data = this._data.clone(), r;
+            var s = k.clone.call(this);
+            return s._data = this._data.clone(), s;
           },
           _minBufferSize: 0
         });
@@ -518,8 +542,8 @@ function dt() {
            *
            *     var hasher = CryptoJS.algo.SHA256.create();
            */
-          init: function(r) {
-            this.cfg = this.cfg.extend(r), this.reset();
+          init: function(s) {
+            this.cfg = this.cfg.extend(s), this.reset();
           },
           /**
            * Resets this hasher to its initial state.
@@ -543,8 +567,8 @@ function dt() {
            *     hasher.update('message');
            *     hasher.update(wordArray);
            */
-          update: function(r) {
-            return this._append(r), this._process(), this;
+          update: function(s) {
+            return this._append(s), this._process(), this;
           },
           /**
            * Finalizes the hash computation.
@@ -560,8 +584,8 @@ function dt() {
            *     var hash = hasher.finalize('message');
            *     var hash = hasher.finalize(wordArray);
            */
-          finalize: function(r) {
-            r && this._append(r);
+          finalize: function(s) {
+            s && this._append(s);
             var d = this._doFinalize();
             return d;
           },
@@ -579,9 +603,9 @@ function dt() {
            *
            *     var SHA256 = CryptoJS.lib.Hasher._createHelper(CryptoJS.algo.SHA256);
            */
-          _createHelper: function(r) {
+          _createHelper: function(s) {
             return function(d, u) {
-              return new r.init(u).finalize(d);
+              return new s.init(u).finalize(d);
             };
           },
           /**
@@ -597,85 +621,85 @@ function dt() {
            *
            *     var HmacSHA256 = CryptoJS.lib.Hasher._createHmacHelper(CryptoJS.algo.SHA256);
            */
-          _createHmacHelper: function(r) {
+          _createHmacHelper: function(s) {
             return function(d, u) {
-              return new B.HMAC.init(r, u).finalize(d);
+              return new B.HMAC.init(s, u).finalize(d);
             };
           }
         });
-        var B = D.algo = {};
-        return D;
+        var B = P.algo = {};
+        return P;
       }(Math);
-      return e;
+      return t;
     });
   }(G)), G.exports;
 }
-(function(v, t) {
-  (function(e, i) {
+(function(v, e) {
+  (function(t, i) {
     v.exports = i(dt());
-  })(Y, function(e) {
+  })(I, function(t) {
     return function(i) {
-      var s = e, m = s.lib, C = m.WordArray, S = m.Hasher, D = s.algo, l = [];
+      var r = t, f = r.lib, y = f.WordArray, C = f.Hasher, P = r.algo, l = [];
       (function() {
-        for (var f = 0; f < 64; f++)
-          l[f] = i.abs(i.sin(f + 1)) * 4294967296 | 0;
+        for (var m = 0; m < 64; m++)
+          l[m] = i.abs(i.sin(m + 1)) * 4294967296 | 0;
       })();
-      var k = D.MD5 = S.extend({
+      var k = P.MD5 = C.extend({
         _doReset: function() {
-          this._hash = new C.init([
+          this._hash = new y.init([
             1732584193,
             4023233417,
             2562383102,
             271733878
           ]);
         },
-        _doProcessBlock: function(f, p) {
+        _doProcessBlock: function(m, p) {
           for (var B = 0; B < 16; B++) {
-            var r = p + B, d = f[r];
-            f[r] = (d << 8 | d >>> 24) & 16711935 | (d << 24 | d >>> 8) & 4278255360;
+            var s = p + B, d = m[s];
+            m[s] = (d << 8 | d >>> 24) & 16711935 | (d << 24 | d >>> 8) & 4278255360;
           }
-          var u = this._hash.words, g = f[p + 0], w = f[p + 1], y = f[p + 2], L = f[p + 3], E = f[p + 4], R = f[p + 5], H = f[p + 6], O = f[p + 7], I = f[p + 8], M = f[p + 9], j = f[p + 10], X = f[p + 11], A = f[p + 12], z = f[p + 13], F = f[p + 14], W = f[p + 15], a = u[0], o = u[1], h = u[2], c = u[3];
-          a = x(a, o, h, c, g, 7, l[0]), c = x(c, a, o, h, w, 12, l[1]), h = x(h, c, a, o, y, 17, l[2]), o = x(o, h, c, a, L, 22, l[3]), a = x(a, o, h, c, E, 7, l[4]), c = x(c, a, o, h, R, 12, l[5]), h = x(h, c, a, o, H, 17, l[6]), o = x(o, h, c, a, O, 22, l[7]), a = x(a, o, h, c, I, 7, l[8]), c = x(c, a, o, h, M, 12, l[9]), h = x(h, c, a, o, j, 17, l[10]), o = x(o, h, c, a, X, 22, l[11]), a = x(a, o, h, c, A, 7, l[12]), c = x(c, a, o, h, z, 12, l[13]), h = x(h, c, a, o, F, 17, l[14]), o = x(o, h, c, a, W, 22, l[15]), a = b(a, o, h, c, w, 5, l[16]), c = b(c, a, o, h, H, 9, l[17]), h = b(h, c, a, o, X, 14, l[18]), o = b(o, h, c, a, g, 20, l[19]), a = b(a, o, h, c, R, 5, l[20]), c = b(c, a, o, h, j, 9, l[21]), h = b(h, c, a, o, W, 14, l[22]), o = b(o, h, c, a, E, 20, l[23]), a = b(a, o, h, c, M, 5, l[24]), c = b(c, a, o, h, F, 9, l[25]), h = b(h, c, a, o, L, 14, l[26]), o = b(o, h, c, a, I, 20, l[27]), a = b(a, o, h, c, z, 5, l[28]), c = b(c, a, o, h, y, 9, l[29]), h = b(h, c, a, o, O, 14, l[30]), o = b(o, h, c, a, A, 20, l[31]), a = P(a, o, h, c, R, 4, l[32]), c = P(c, a, o, h, I, 11, l[33]), h = P(h, c, a, o, X, 16, l[34]), o = P(o, h, c, a, F, 23, l[35]), a = P(a, o, h, c, w, 4, l[36]), c = P(c, a, o, h, E, 11, l[37]), h = P(h, c, a, o, O, 16, l[38]), o = P(o, h, c, a, j, 23, l[39]), a = P(a, o, h, c, z, 4, l[40]), c = P(c, a, o, h, g, 11, l[41]), h = P(h, c, a, o, L, 16, l[42]), o = P(o, h, c, a, H, 23, l[43]), a = P(a, o, h, c, M, 4, l[44]), c = P(c, a, o, h, A, 11, l[45]), h = P(h, c, a, o, W, 16, l[46]), o = P(o, h, c, a, y, 23, l[47]), a = _(a, o, h, c, g, 6, l[48]), c = _(c, a, o, h, O, 10, l[49]), h = _(h, c, a, o, F, 15, l[50]), o = _(o, h, c, a, R, 21, l[51]), a = _(a, o, h, c, A, 6, l[52]), c = _(c, a, o, h, L, 10, l[53]), h = _(h, c, a, o, j, 15, l[54]), o = _(o, h, c, a, w, 21, l[55]), a = _(a, o, h, c, I, 6, l[56]), c = _(c, a, o, h, W, 10, l[57]), h = _(h, c, a, o, H, 15, l[58]), o = _(o, h, c, a, z, 21, l[59]), a = _(a, o, h, c, E, 6, l[60]), c = _(c, a, o, h, X, 10, l[61]), h = _(h, c, a, o, y, 15, l[62]), o = _(o, h, c, a, M, 21, l[63]), u[0] = u[0] + a | 0, u[1] = u[1] + o | 0, u[2] = u[2] + h | 0, u[3] = u[3] + c | 0;
+          var u = this._hash.words, g = m[p + 0], w = m[p + 1], x = m[p + 2], L = m[p + 3], E = m[p + 4], R = m[p + 5], H = m[p + 6], O = m[p + 7], Y = m[p + 8], M = m[p + 9], j = m[p + 10], X = m[p + 11], A = m[p + 12], q = m[p + 13], z = m[p + 14], F = m[p + 15], a = u[0], o = u[1], h = u[2], c = u[3];
+          a = S(a, o, h, c, g, 7, l[0]), c = S(c, a, o, h, w, 12, l[1]), h = S(h, c, a, o, x, 17, l[2]), o = S(o, h, c, a, L, 22, l[3]), a = S(a, o, h, c, E, 7, l[4]), c = S(c, a, o, h, R, 12, l[5]), h = S(h, c, a, o, H, 17, l[6]), o = S(o, h, c, a, O, 22, l[7]), a = S(a, o, h, c, Y, 7, l[8]), c = S(c, a, o, h, M, 12, l[9]), h = S(h, c, a, o, j, 17, l[10]), o = S(o, h, c, a, X, 22, l[11]), a = S(a, o, h, c, A, 7, l[12]), c = S(c, a, o, h, q, 12, l[13]), h = S(h, c, a, o, z, 17, l[14]), o = S(o, h, c, a, F, 22, l[15]), a = b(a, o, h, c, w, 5, l[16]), c = b(c, a, o, h, H, 9, l[17]), h = b(h, c, a, o, X, 14, l[18]), o = b(o, h, c, a, g, 20, l[19]), a = b(a, o, h, c, R, 5, l[20]), c = b(c, a, o, h, j, 9, l[21]), h = b(h, c, a, o, F, 14, l[22]), o = b(o, h, c, a, E, 20, l[23]), a = b(a, o, h, c, M, 5, l[24]), c = b(c, a, o, h, z, 9, l[25]), h = b(h, c, a, o, L, 14, l[26]), o = b(o, h, c, a, Y, 20, l[27]), a = b(a, o, h, c, q, 5, l[28]), c = b(c, a, o, h, x, 9, l[29]), h = b(h, c, a, o, O, 14, l[30]), o = b(o, h, c, a, A, 20, l[31]), a = D(a, o, h, c, R, 4, l[32]), c = D(c, a, o, h, Y, 11, l[33]), h = D(h, c, a, o, X, 16, l[34]), o = D(o, h, c, a, z, 23, l[35]), a = D(a, o, h, c, w, 4, l[36]), c = D(c, a, o, h, E, 11, l[37]), h = D(h, c, a, o, O, 16, l[38]), o = D(o, h, c, a, j, 23, l[39]), a = D(a, o, h, c, q, 4, l[40]), c = D(c, a, o, h, g, 11, l[41]), h = D(h, c, a, o, L, 16, l[42]), o = D(o, h, c, a, H, 23, l[43]), a = D(a, o, h, c, M, 4, l[44]), c = D(c, a, o, h, A, 11, l[45]), h = D(h, c, a, o, F, 16, l[46]), o = D(o, h, c, a, x, 23, l[47]), a = _(a, o, h, c, g, 6, l[48]), c = _(c, a, o, h, O, 10, l[49]), h = _(h, c, a, o, z, 15, l[50]), o = _(o, h, c, a, R, 21, l[51]), a = _(a, o, h, c, A, 6, l[52]), c = _(c, a, o, h, L, 10, l[53]), h = _(h, c, a, o, j, 15, l[54]), o = _(o, h, c, a, w, 21, l[55]), a = _(a, o, h, c, Y, 6, l[56]), c = _(c, a, o, h, F, 10, l[57]), h = _(h, c, a, o, H, 15, l[58]), o = _(o, h, c, a, q, 21, l[59]), a = _(a, o, h, c, E, 6, l[60]), c = _(c, a, o, h, X, 10, l[61]), h = _(h, c, a, o, x, 15, l[62]), o = _(o, h, c, a, M, 21, l[63]), u[0] = u[0] + a | 0, u[1] = u[1] + o | 0, u[2] = u[2] + h | 0, u[3] = u[3] + c | 0;
         },
         _doFinalize: function() {
-          var f = this._data, p = f.words, B = this._nDataBytes * 8, r = f.sigBytes * 8;
-          p[r >>> 5] |= 128 << 24 - r % 32;
+          var m = this._data, p = m.words, B = this._nDataBytes * 8, s = m.sigBytes * 8;
+          p[s >>> 5] |= 128 << 24 - s % 32;
           var d = i.floor(B / 4294967296), u = B;
-          p[(r + 64 >>> 9 << 4) + 15] = (d << 8 | d >>> 24) & 16711935 | (d << 24 | d >>> 8) & 4278255360, p[(r + 64 >>> 9 << 4) + 14] = (u << 8 | u >>> 24) & 16711935 | (u << 24 | u >>> 8) & 4278255360, f.sigBytes = (p.length + 1) * 4, this._process();
-          for (var g = this._hash, w = g.words, y = 0; y < 4; y++) {
-            var L = w[y];
-            w[y] = (L << 8 | L >>> 24) & 16711935 | (L << 24 | L >>> 8) & 4278255360;
+          p[(s + 64 >>> 9 << 4) + 15] = (d << 8 | d >>> 24) & 16711935 | (d << 24 | d >>> 8) & 4278255360, p[(s + 64 >>> 9 << 4) + 14] = (u << 8 | u >>> 24) & 16711935 | (u << 24 | u >>> 8) & 4278255360, m.sigBytes = (p.length + 1) * 4, this._process();
+          for (var g = this._hash, w = g.words, x = 0; x < 4; x++) {
+            var L = w[x];
+            w[x] = (L << 8 | L >>> 24) & 16711935 | (L << 24 | L >>> 8) & 4278255360;
           }
           return g;
         },
         clone: function() {
-          var f = S.clone.call(this);
-          return f._hash = this._hash.clone(), f;
+          var m = C.clone.call(this);
+          return m._hash = this._hash.clone(), m;
         }
       });
-      function x(f, p, B, r, d, u, g) {
-        var w = f + (p & B | ~p & r) + d + g;
+      function S(m, p, B, s, d, u, g) {
+        var w = m + (p & B | ~p & s) + d + g;
         return (w << u | w >>> 32 - u) + p;
       }
-      function b(f, p, B, r, d, u, g) {
-        var w = f + (p & r | B & ~r) + d + g;
+      function b(m, p, B, s, d, u, g) {
+        var w = m + (p & s | B & ~s) + d + g;
         return (w << u | w >>> 32 - u) + p;
       }
-      function P(f, p, B, r, d, u, g) {
-        var w = f + (p ^ B ^ r) + d + g;
+      function D(m, p, B, s, d, u, g) {
+        var w = m + (p ^ B ^ s) + d + g;
         return (w << u | w >>> 32 - u) + p;
       }
-      function _(f, p, B, r, d, u, g) {
-        var w = f + (B ^ (p | ~r)) + d + g;
+      function _(m, p, B, s, d, u, g) {
+        var w = m + (B ^ (p | ~s)) + d + g;
         return (w << u | w >>> 32 - u) + p;
       }
-      s.MD5 = S._createHelper(k), s.HmacMD5 = S._createHmacHelper(k);
-    }(Math), e.MD5;
+      r.MD5 = C._createHelper(k), r.HmacMD5 = C._createHmacHelper(k);
+    }(Math), t.MD5;
   });
-})(Z);
-var ut = Z.exports;
+})(Q);
+var ut = Q.exports;
 const ft = /* @__PURE__ */ nt(ut);
-function q(v) {
+function W(v) {
   return v * 20 + 12;
 }
 class mt {
@@ -685,19 +709,19 @@ class mt {
     n(this, "remoteOnly", !1);
     n(this, "avatars", [this.avatar_gravatar]);
   }
-  avatar_gravatar(t) {
-    return "https://www.gravatar.com/avatar/" + ft(t.toLowerCase()) + "?s=20&d=mm";
+  avatar_gravatar(e) {
+    return "https://www.gravatar.com/avatar/" + ft(e.toLowerCase()) + "?s=20&d=mm";
   }
 }
 class V {
   // optional
-  constructor(t, e, i) {
+  constructor(e, t, i) {
     n(this, "image");
-    this.name = t, this.email = e, this.date = i;
+    this.name = e, this.email = t, this.date = i;
   }
 }
 class J {
-  constructor(t, e) {
+  constructor(e, t) {
     n(this, "container");
     n(this, "warnings", []);
     n(this, "inHeadsRef", []);
@@ -720,7 +744,7 @@ class J {
     n(this, "view");
     n(this, "committer");
     n(this, "author");
-    this.container = t, this.data = e, this.data.obj = this, e.inHeads == null && (e.inHeads = []), e.parenthashes == null && (e.parenthashes = []), e.refnames == null && (e.refnames = []), this.sha = e.sha, this.ssha = e.ssha, this.subject = e.subject, this.indexY = t.maxIndexY++, this.committer = new V(this.data.committername, this.data.committeremail, new Date(this.data.committerdate * 1e3)), this.author = new V(this.data.authorname, this.data.authoremail, new Date(this.data.authordate * 1e3));
+    this.container = e, this.data = t, this.data.obj = this, t.inHeads == null && (t.inHeads = []), t.parenthashes == null && (t.parenthashes = []), t.refnames == null && (t.refnames = []), this.sha = t.sha, this.ssha = t.ssha, this.subject = t.subject, this.indexY = e.maxIndexY++, this.committer = new V(this.data.committername, this.data.committeremail, new Date(this.data.committerdate * 1e3)), this.author = new V(this.data.authorname, this.data.authoremail, new Date(this.data.authordate * 1e3));
   }
   getShortSha() {
     return this.ssha;
@@ -729,68 +753,68 @@ class J {
     return this.sha;
   }
   initRelations() {
-    var t = this;
-    this.data.parenthashes.forEach((e) => {
-      var i = this.container.commits[e];
-      if (i == null && (i = new J(this.container, { sha: e + Math.random() }), i.outOfScope = !0, t.container.addCommit(i)), this.parents.push(i), i.childs.push(this), this.siblings = i.childs, this.parents.length > 0) {
-        var s = this.parents[0];
-        this.directparent = s, s.directchild = this;
+    var e = this;
+    this.data.parenthashes.forEach((t) => {
+      var i = this.container.commits[t];
+      if (i == null && (i = new J(this.container, { sha: t + Math.random() }), i.outOfScope = !0, e.container.addCommit(i)), this.parents.push(i), i.childs.push(this), this.siblings = i.childs, this.parents.length > 0) {
+        var r = this.parents[0];
+        this.directparent = r, r.directchild = this;
       }
-    }), this.data.inHeads.forEach((e) => {
-      var i = this.container.commits[e];
+    }), this.data.inHeads.forEach((t) => {
+      var i = this.container.commits[t];
       this.inHeadsRef.indexOf(i) === void 0 && this.inHeadsRef.push(i);
     });
   }
   initDefaultBranch() {
-    for (var t = this; t != null; )
-      (t.branch == null || t.branch.specifity > this.branch.specifity) && (t.branch = this.branch), t.branch.start = t, t.branch.origin = t.directparent, t = t.directparent;
+    for (var e = this; e != null; )
+      (e.branch == null || e.branch.specifity > this.branch.specifity) && (e.branch = this.branch), e.branch.start = e, e.branch.origin = e.directparent, e = e.directparent;
   }
   initHeadSpecifity() {
-    for (var t = 0; t < this.data.refnames.length; t++) {
-      var e = this.data.refnames[t];
-      if (!this.container.config.remoteOnly || e.indexOf("origin/") == 0) {
-        this.container.config.remoteOnly && (e = e.replace(/^origin./, ""));
-        var i = e.replace(/[^\/-]/g, "").length * 1e3;
-        i += e.replace(/[^a-zA-Z0-9-]/, "").length, this.container.addBranch(e, this, i), (this.maxSpecifity == null || i < this.maxSpecifity) && (console.debug("assigning branch", e, this.sha, this.maxSpecifity, i), this.maxSpecifity = i, this.branch = this.container.headsMap[e]), this.initDefaultBranch();
+    for (var e = 0; e < this.data.refnames.length; e++) {
+      var t = this.data.refnames[e];
+      if (!this.container.config.remoteOnly || t.indexOf("origin/") == 0) {
+        this.container.config.remoteOnly && (t = t.replace(/^origin./, ""));
+        var i = t.replace(/[^\/-]/g, "").length * 1e3;
+        i += t.replace(/[^a-zA-Z0-9-]/, "").length, this.container.addBranch(t, this, i), (this.maxSpecifity == null || i < this.maxSpecifity) && (console.debug("assigning branch", t, this.sha, this.maxSpecifity, i), this.maxSpecifity = i, this.branch = this.container.headsMap[t]), this.initDefaultBranch();
       }
     }
   }
   initMerges() {
     if (this.merges = { standard: [], anonymous: [] }, this.warnings = [], this.parents.length == 1) {
-      var t = this.parents[0];
-      this.directparent = t, t.directchild = this;
+      var e = this.parents[0];
+      this.directparent = e, e.directchild = this;
     }
     if (this.parents.length >= 2) {
-      var t = this.parents[0];
-      this.directparent = t, t.directchild = this;
-      for (var e = 1; e < this.parents.length; e++) {
-        var i = this.parents[e];
-        i != null && (i.data.refnames.length > 0 || i.inHeadsRef.length != t.inHeadsRef.length ? this.merges.standard.push({ source: i }) : (this.merges.anonymous.push({ source: i }), this.initAnonymous()));
+      var e = this.parents[0];
+      this.directparent = e, e.directchild = this;
+      for (var t = 1; t < this.parents.length; t++) {
+        var i = this.parents[t];
+        i != null && (i.data.refnames.length > 0 || i.inHeadsRef.length != e.inHeadsRef.length ? this.merges.standard.push({ source: i }) : (this.merges.anonymous.push({ source: i }), this.initAnonymous()));
       }
     }
   }
   initAnonymous() {
-    this.merges.anonymous.forEach((t) => {
-      for (var e = t.source, i = this; i != null && i.branch == null; )
+    this.merges.anonymous.forEach((e) => {
+      for (var t = e.source, i = this; i != null && i.branch == null; )
         i = i.directchild;
-      i != null && e.branch == null && (e.branch = new K(i.branch.ref + "/anonymous" + e.sha + Math.random(), e, i.branch.specifity + 1), e.branch.anonymous = !0, e.branch.parent = i.branch, e.branch.start = i, e.branch.category = i.branch.category, this.container.headsMap[e.branch.ref] = e.branch);
+      i != null && t.branch == null && (t.branch = new K(i.branch.ref + "/anonymous" + t.sha + Math.random(), t, i.branch.specifity + 1), t.branch.anonymous = !0, t.branch.parent = i.branch, t.branch.start = i, t.branch.category = i.branch.category, this.container.headsMap[t.branch.ref] = t.branch);
     });
   }
-  getColor(t) {
+  getColor(e) {
     if (this.branch == null)
       this.warn("No Branch set");
     else {
-      var e = this.branch;
-      this.branch.anonymous && (e = this.branch.parent);
-      var i = e.lane * 300 / this.container.maxX;
-      return "hsl(" + i + ", 100%, " + t + "%)";
+      var t = this.branch;
+      this.branch.anonymous && (t = this.branch.parent);
+      var i = t.lane * 300 / this.container.maxX;
+      return "hsl(" + i + ", 100%, " + e + "%)";
     }
   }
   hasMerges() {
     return this.merges.standard.length > 0 || this.merges.anonymous.length > 0;
   }
   getX() {
-    return q(this.getLane());
+    return W(this.getLane());
   }
   getY() {
     return this.outOfScope ? this.container.rootLabel.offsetTop + 20 : this.view.label.offsetTop - this.container.firstCommit.view.label.offsetTop + this.view.label.offsetHeight / 2;
@@ -801,40 +825,40 @@ class J {
   /** Tip plus the next direct child index (position of last merge) */
   getTipPlusIndexY() {
     if (this.branch != null && this.branch.commit != null) {
-      var t = this.branch.commit.indexY;
-      return this.branch.commit.childs.forEach((e) => {
-        t = Math.min(t, e.indexY);
-      }), t;
+      var e = this.branch.commit.indexY;
+      return this.branch.commit.childs.forEach((t) => {
+        e = Math.min(e, t.indexY);
+      }), e;
     }
     return 0;
   }
   /** does this branch intersect with another when drawn next to each other. 
       can this branch be displayed on the same X axis without overlapping? */
-  intersects(t) {
-    return this.outOfScope || t.outOfScope ? !0 : this.getOriginIndexY() > t.getTipPlusIndexY() && this.getTipPlusIndexY() < t.getOriginIndexY();
+  intersects(e) {
+    return this.outOfScope || e.outOfScope ? !0 : this.getOriginIndexY() > e.getTipPlusIndexY() && this.getTipPlusIndexY() < e.getOriginIndexY();
   }
   getIndexY() {
     return this.indexY;
   }
-  warn(t) {
-    this.warnings.push(t), this.debug(t);
+  warn(e) {
+    this.warnings.push(e), this.debug(e);
   }
-  debug(t) {
-    console && console.debug(t, this);
+  debug(e) {
+    console && console.debug(e, this);
   }
   getLane() {
     return this.branch != null ? this.branch.commit.branch.lane : null;
   }
 }
-class Q {
-  constructor(t, e) {
+class Z {
+  constructor(e, t) {
     n(this, "element");
     // jsgl element
     n(this, "renderedTo");
     // jsgl canvas (any html)
     n(this, "canvas");
     n(this, "dependencies", []);
-    this.canvas = t, this.element = e;
+    this.canvas = e, this.element = t;
   }
   addIfMissing() {
     this.element !== void 0 && this.renderedTo == null && (this.addElements(), this.renderedTo = this.canvas);
@@ -843,36 +867,36 @@ class Q {
     this.canvas.addElement(this.element);
   }
   update() {
-    this.dependencies.forEach((t) => {
-      t.update();
+    this.dependencies.forEach((e) => {
+      e.update();
     });
   }
-  dependsOn(t) {
-    t.dependencies.push(this);
+  dependsOn(e) {
+    e.dependencies.push(this);
   }
 }
-class N extends Q {
-  constructor(e, i) {
-    super(e, i);
+class N extends Z {
+  constructor(t, i) {
+    super(t, i);
     n(this, "parentDot");
     n(this, "childDot");
     n(this, "lineColor");
   }
-  from(e) {
-    return this.dependsOn(e), this.parentDot = e, this;
+  from(t) {
+    return this.dependsOn(t), this.parentDot = t, this;
   }
-  to(e) {
-    return this.childDot = e, this;
+  to(t) {
+    return this.childDot = t, this;
   }
-  color(e) {
-    return this.element.getStroke().setWeight(1), this.element.getStroke().setColor(e), this.lineColor = e, this.addIfMissing(), this;
+  color(t) {
+    return this.element.getStroke().setWeight(1), this.element.getStroke().setColor(t), this.lineColor = t, this.addIfMissing(), this;
   }
 }
 class pt extends N {
-  constructor(e) {
-    super(e, e.createLine());
+  constructor(t) {
+    super(t, t.createLine());
     n(this, "secondLine");
-    this.secondLine = e.createLine();
+    this.secondLine = t.createLine();
   }
   addElements() {
     super.addElements(), this.canvas.addElement(this.secondLine);
@@ -882,8 +906,8 @@ class pt extends N {
   }
 }
 class gt extends N {
-  constructor(e) {
-    super(e, e.createCurve());
+  constructor(t) {
+    super(t, t.createCurve());
     n(this, "arrow");
     this.arrow = this.canvas.createPolygon();
   }
@@ -891,45 +915,45 @@ class gt extends N {
     super.addElements(), this.canvas.addElement(this.arrow);
   }
   update() {
-    var e = this.childDot.x, i = this.childDot.y, s = this.parentDot.x, m = this.parentDot.y, C = this.lineColor, S = e < s ? 1 : -1;
-    this.element.setStartPointXY(s, m - this.parentDot.height / 2), this.element.setEndPointXY(e + this.childDot.width / 2 * S, i), this.element.setControl2PointXY(s, i), this.element.setControl1PointXY(s, i), this.element.getStroke().setWeight(1), this.element.getStroke().setColor(C), this.arrow.getStroke().setWeight(0), this.arrow.getFill().setColor(C), this.arrow.clearPoints(), this.arrow.addPointXY(0, 0), this.arrow.addPointXY(6, -4), this.arrow.addPointXY(6, 4);
-    for (var D = 0; D < this.arrow.getPointsCount(); D++) {
-      var l = this.arrow.getPointAt(D).X, k = this.arrow.getPointAt(D).Y;
-      this.arrow.setPointXYAt(l * S + e + this.childDot.width / 2 * S, k + i, D);
+    var t = this.childDot.x, i = this.childDot.y, r = this.parentDot.x, f = this.parentDot.y, y = this.lineColor, C = t < r ? 1 : -1;
+    this.element.setStartPointXY(r, f - this.parentDot.height / 2), this.element.setEndPointXY(t + this.childDot.width / 2 * C, i), this.element.setControl2PointXY(r, i), this.element.setControl1PointXY(r, i), this.element.getStroke().setWeight(1), this.element.getStroke().setColor(y), this.arrow.getStroke().setWeight(0), this.arrow.getFill().setColor(y), this.arrow.clearPoints(), this.arrow.addPointXY(0, 0), this.arrow.addPointXY(6, -4), this.arrow.addPointXY(6, 4);
+    for (var P = 0; P < this.arrow.getPointsCount(); P++) {
+      var l = this.arrow.getPointAt(P).X, k = this.arrow.getPointAt(P).Y;
+      this.arrow.setPointXYAt(l * C + t + this.childDot.width / 2 * C, k + i, P);
     }
   }
 }
-class vt extends Q {
-  constructor(e) {
-    super(e, e.createRectangle());
+class vt extends Z {
+  constructor(t) {
+    super(t, t.createRectangle());
     n(this, "x");
     n(this, "y");
     n(this, "width");
     n(this, "height");
   }
-  size(e, i) {
-    return this.width = e, this.height = i, this.element.setWidth(e), this.element.setHeight(i), this.element.setXRadius(e / 4), this.element.setYRadius(e / 4), this.update(), this.addIfMissing(), this;
+  size(t, i) {
+    return this.width = t, this.height = i, this.element.setWidth(t), this.element.setHeight(i), this.element.setXRadius(t / 4), this.element.setYRadius(t / 4), this.update(), this.addIfMissing(), this;
   }
-  at(e, i) {
-    return this.x = e, this.y = i, this.update(), this.addIfMissing(), this;
+  at(t, i) {
+    return this.x = t, this.y = i, this.update(), this.addIfMissing(), this;
   }
-  color(e, i) {
-    return this.element.getStroke().setWeight(1), this.element.getStroke().setColor(e), this.element.getFill().setColor(i), this;
+  color(t, i) {
+    return this.element.getStroke().setWeight(1), this.element.getStroke().setColor(t), this.element.getFill().setColor(i), this;
   }
   update() {
     this.element.setLocationXY(this.x - this.width / 2, this.y - this.height / 2), super.update();
   }
 }
 class wt extends N {
-  constructor(t) {
-    super(t, t.createLine());
+  constructor(e) {
+    super(e, e.createLine());
   }
   update() {
     super.update(), this.element.setStartPointXY(this.parentDot.x, this.parentDot.y - this.parentDot.height / 2), this.element.setEndPointXY(this.childDot.x, this.childDot.y + this.childDot.height / 2);
   }
 }
-class bt {
-  constructor(t, e, i) {
+class yt {
+  constructor(e, t, i) {
     n(this, "commit");
     n(this, "label");
     n(this, "canvas");
@@ -937,15 +961,15 @@ class bt {
     n(this, "config");
     n(this, "dot");
     n(this, "lines", []);
-    this.canvas = t, this.config = e, this.commit = i, this.dot = new vt(this.canvas);
+    this.canvas = e, this.config = t, this.commit = i, this.dot = new vt(this.canvas);
   }
   addRelations() {
     if (this.commit.directparent != null) {
-      var t;
-      this.commit.getLane() == this.commit.directparent.getLane() || this.commit.directparent.outOfScope ? t = new wt(this.canvas).from(this.commit.directparent.view.dot).to(this.dot).color(this.commit.getColor(20)) : t = new pt(this.canvas).from(this.commit.directparent.view.dot).to(this.dot).color(this.commit.getColor(30)), this.lines.push(t);
+      var e;
+      this.commit.getLane() == this.commit.directparent.getLane() || this.commit.directparent.outOfScope ? e = new wt(this.canvas).from(this.commit.directparent.view.dot).to(this.dot).color(this.commit.getColor(20)) : e = new pt(this.canvas).from(this.commit.directparent.view.dot).to(this.dot).color(this.commit.getColor(30)), this.lines.push(e);
     }
-    var e = this.commit.merges.standard.concat(this.commit.merges.anonymous);
-    e.forEach((i) => {
+    var t = this.commit.merges.standard.concat(this.commit.merges.anonymous);
+    t.forEach((i) => {
       this.lines.push(
         new gt(this.canvas).from(i.source.view.dot).to(this.dot).color(i.source.getColor(35))
       );
@@ -957,63 +981,63 @@ class bt {
   }
 }
 class T {
-  static extend(t) {
-    var e = t;
-    return t.classList.add("gitline-expandable"), e.whenFull = (i) => {
-      e.onclick = () => {
-        e.innerHTML = i, t.classList.add("gitline-expandable-expanded"), T.selectElementText(t);
+  static extend(e) {
+    var t = e;
+    return e.classList.add("gitline-expandable"), t.whenFull = (i) => {
+      t.onclick = () => {
+        t.innerHTML = i, e.classList.add("gitline-expandable-expanded"), T.selectElementText(e);
       };
-    }, e.whenShort = (i) => {
-      e.innerHTML = i, e.onmouseout = () => {
+    }, t.whenShort = (i) => {
+      t.innerHTML = i, t.onmouseout = () => {
         window.setTimeout(() => {
-          e.innerHTML = i, t.classList.remove("gitline-expandable-expanded");
+          t.innerHTML = i, e.classList.remove("gitline-expandable-expanded");
         }, 1e3);
       };
-    }, e;
+    }, t;
   }
   // x-browser text select
   // http://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse
-  static selectElementText(t) {
-    var e = window.document, i, s;
-    window.getSelection && e.createRange ? (i = window.getSelection(), s = e.createRange(), s.selectNodeContents(t), i.removeAllRanges(), i.addRange(s)) : e.body.createTextRange && (s = e.body.createTextRange(), s.moveToElementText(t), s.select());
+  static selectElementText(e) {
+    var t = window.document, i, r;
+    window.getSelection && t.createRange ? (i = window.getSelection(), r = t.createRange(), r.selectNodeContents(e), i.removeAllRanges(), i.addRange(r)) : t.body.createTextRange && (r = t.body.createTextRange(), r.moveToElementText(e), r.select());
   }
 }
 class tt {
-  constructor(t) {
+  constructor(e) {
     n(this, "url");
     n(this, "callback");
     n(this, "errorCallback");
-    this.url = t;
+    this.url = e;
   }
-  whenDone(t) {
-    this.callback(t);
+  whenDone(e) {
+    this.callback(e);
   }
-  withErrorCallback(t) {
-    this.errorCallback = t;
+  withErrorCallback(e) {
+    this.errorCallback = e;
   }
-  withCallback(t) {
-    this.callback = t;
+  withCallback(e) {
+    this.callback = e;
   }
   /** this method should be overwritten. it must call whenDone(data) when all data was loaded. */
-  onRequested(t) {
+  onRequested(e) {
     throw new Error("onRequested not implemented on " + this);
   }
   request() {
     this.onRequested(this.url);
   }
-  error(t) {
-    this.errorCallback(t);
+  error(e) {
+    this.errorCallback(e);
   }
 }
-class yt extends tt {
-  constructor(e, i, s) {
-    super(e);
+class bt extends tt {
+  constructor(t, i, r) {
+    super(t);
     n(this, "forks", []);
     n(this, "baseBranches", []);
     n(this, "data", {});
     n(this, "limit");
     n(this, "accessToken");
-    n(this, "fetchGithubJson", (e) => fetch(e, {
+    n(this, "fetchGithubJson", (t) => fetch(t, {
       headers: {
         ...this.accessToken && { Authorization: `token ${this.accessToken}` },
         Accept: "application/vnd.github.v3+json"
@@ -1023,83 +1047,83 @@ class yt extends tt {
         return i.json();
       throw new Error("Response wasn't OK when fetching JSON");
     }));
-    this.accessToken = s, this.limit = i;
+    this.accessToken = r, this.limit = i;
   }
-  gitURL(e, i, s = "") {
-    return e.indexOf("api.github.com") == -1 && (e = e.replace(/.*github.com\//, "https://api.github.com/repos/")), e + "/" + i + "?per_page=" + this.limit + "&" + s;
+  gitURL(t, i, r = "") {
+    return t.indexOf("api.github.com") == -1 && (t = t.replace(/.*github.com\//, "https://api.github.com/repos/")), t + "/" + i + "?per_page=" + this.limit + "&" + r;
   }
-  onRequested(e) {
-    this.loadForks(e);
+  onRequested(t) {
+    this.loadForks(t);
   }
-  loadForks(e) {
-    this.fetchGithubJson(this.gitURL(e, "forks")).then((i) => {
-      this.fetchGithubJson(this.gitURL(e, "branches")).then((s) => {
-        this.processBranches(e, s), this.forks = i, this.loadBranches();
+  loadForks(t) {
+    this.fetchGithubJson(this.gitURL(t, "forks")).then((i) => {
+      this.fetchGithubJson(this.gitURL(t, "branches")).then((r) => {
+        this.processBranches(t, r), this.forks = i, this.loadBranches();
       });
     }).catch((i) => {
       this.error("Github API: " + i);
     });
   }
-  processBranches(e, i) {
-    i.forEach((s) => {
-      s.repo = e.url !== void 0 ? e.url : e, e.full_name !== void 0 && (s.name = s.name + "@" + e.full_name), this.baseBranches.push(s);
+  processBranches(t, i) {
+    i.forEach((r) => {
+      r.repo = t.url !== void 0 ? t.url : t, t.full_name !== void 0 && (r.name = r.name + "@" + t.full_name), this.baseBranches.push(r);
     });
   }
   loadBranches() {
-    var e = this.forks.map((i) => this.fetchGithubJson(this.gitURL(i.url, "branches")).then((s) => {
-      console.debug("loaded branches for " + i.name), this.processBranches(i, s);
+    var t = this.forks.map((i) => this.fetchGithubJson(this.gitURL(i.url, "branches")).then((r) => {
+      console.debug("loaded branches for " + i.name), this.processBranches(i, r);
     }));
-    Promise.all(e).then(() => {
+    Promise.all(t).then(() => {
       console.debug("all branches loaded"), this.loadCommits();
     });
   }
   loadCommits() {
-    var e = [];
+    var t = [];
     this.baseBranches.forEach((i) => {
-      var s = this.data[i.commit.sha];
-      s == null && e.push(
-        this.fetchGithubJson(this.gitURL(i.repo, "commits", "sha=" + i.commit.sha)).then((m) => {
-          console.debug("loaded commits for " + i.name), this.processCommits(m);
+      var r = this.data[i.commit.sha];
+      r == null && t.push(
+        this.fetchGithubJson(this.gitURL(i.repo, "commits", "sha=" + i.commit.sha)).then((f) => {
+          console.debug("loaded commits for " + i.name), this.processCommits(f);
         })
       );
-    }), Promise.all(e).then(() => {
+    }), Promise.all(t).then(() => {
       this.process();
     });
   }
-  processCommits(e) {
-    e.map((i) => {
-      var s = {};
-      return s.sha = i.sha, s.ssha = i.sha.substring(0, 8), s.parenthashes = i.parents.map((m) => m.sha), s.authorname = i.commit.author.name, s.authoremail = i.commit.author.email, s.authordate = new Date(i.commit.author.date).valueOf() / 1e3, s.authortimestamp = new Date(i.commit.author.date).valueOf(), s.committername = i.commit.committer.name, s.committeremail = i.commit.committer.email, s.committerdate = new Date(i.commit.committer.date).valueOf() / 1e3, s.committertimestamp = new Date(i.commit.committer.date).valueOf(), s.subject = i.commit.message, s.body = "", s.refnames = [], s.inHeads = [], s;
+  processCommits(t) {
+    t.map((i) => {
+      var r = {};
+      return r.sha = i.sha, r.ssha = i.sha.substring(0, 8), r.parenthashes = i.parents.map((f) => f.sha), r.authorname = i.commit.author.name, r.authoremail = i.commit.author.email, r.authordate = new Date(i.commit.author.date).valueOf() / 1e3, r.authortimestamp = new Date(i.commit.author.date).valueOf(), r.committername = i.commit.committer.name, r.committeremail = i.commit.committer.email, r.committerdate = new Date(i.commit.committer.date).valueOf() / 1e3, r.committertimestamp = new Date(i.commit.committer.date).valueOf(), r.subject = i.commit.message, r.body = "", r.refnames = [], r.inHeads = [], r;
     }).forEach((i) => {
       this.data[i.sha] = i;
     });
   }
   process() {
     this.baseBranches.forEach((i) => {
-      var s = this.data[i.commit.sha];
-      s == null || (i.assigned = !0, s.refnames.push(i.name), this.assignHeads(s));
+      var r = this.data[i.commit.sha];
+      r == null || (i.assigned = !0, r.refnames.push(i.name), this.assignHeads(r));
     });
-    var e = {};
-    Object.keys(this.data).sort((i, s) => this.data[s].committertimestamp - this.data[i].committertimestamp).forEach((i) => {
-      e[i] = this.data[i];
-    }), this.whenDone(e);
+    var t = {};
+    Object.keys(this.data).sort((i, r) => this.data[r].committertimestamp - this.data[i].committertimestamp).forEach((i) => {
+      t[i] = this.data[i];
+    }), this.whenDone(t);
   }
-  assignHeads(e) {
-    for (e.parents1 = e.parenthashes.map((s) => s); e.parents1.length > 0; ) {
+  assignHeads(t) {
+    for (t.parents1 = t.parenthashes.map((r) => r); t.parents1.length > 0; ) {
       var i = [];
-      e.parents1.forEach((s) => {
-        var m = this.data[s];
-        m != null && (m.inHeads.push(e.sha), m.parenthashes.forEach((C) => {
-          i.indexOf(C) === -1 && i.push(C);
+      t.parents1.forEach((r) => {
+        var f = this.data[r];
+        f != null && (f.inHeads.push(t.sha), f.parenthashes.forEach((y) => {
+          i.indexOf(y) === -1 && i.push(y);
         }));
-      }), e.parents1 = i;
+      }), t.parents1 = i;
     }
   }
 }
 class xt extends tt {
   constructor() {
     super(...arguments);
-    n(this, "onRequested", (e) => fetch(e, {
+    n(this, "onRequested", (t) => fetch(t, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json"
@@ -1111,7 +1135,7 @@ class xt extends tt {
     }).then((i) => {
       this.whenDone(i);
     }).catch(() => {
-      this.error("Error loading git data from " + e + " create it using git2json");
+      this.error("Error loading git data from " + t + " create it using git2json");
     }));
   }
 }
@@ -1139,56 +1163,56 @@ class et {
   static create() {
     return new et();
   }
-  addCommit(t) {
-    this.commits[t.getFullSha()] = t, this.firstCommit === void 0 && (this.firstCommit = t);
+  addCommit(e) {
+    this.commits[e.getFullSha()] = e, this.firstCommit === void 0 && (this.firstCommit = e);
   }
-  addBranch(t, e, i) {
-    this.headsMap[t] = new K(t, e, i);
+  addBranch(e, t, i) {
+    this.headsMap[e] = new K(e, t, i);
   }
   render() {
-    this.canvas = new jsgl.Panel(this.graphicalPanel), this.al.thenSingle("Loading Data", () => {
-      this.al.suspend(), this.commitProvider.withCallback((t) => {
-        this.data = t, this.al.resume();
-      }), this.commitProvider.withErrorCallback((t) => {
-        this.al.error(t);
+    this.canvas = new jsgl.Panel(this.graphicalPanel), this.al.thenSingle("Loading Data", () => new Promise((e, t) => {
+      this.al.suspend(), this.commitProvider.withCallback((i) => {
+        this.data = i, this.al.resume(), e(null);
+      }), this.commitProvider.withErrorCallback((i) => {
+        this.al.error(i), t(i);
       }), this.commitProvider.request();
-    }).then(
+    })).then(
       "Loading Commits",
       () => Object.keys(this.data),
-      (t) => {
-        var e = new J(this, this.data[t]);
-        this.addCommit(e);
+      (e) => {
+        var t = new J(this, this.data[e]);
+        this.addCommit(t);
       }
     ).thenSingle("Building Graph", () => {
       this.buildGraph();
     }).then(
       "Drawing Labels",
       () => Object.keys(this.commits),
-      (t) => {
-        var e = this.commits[t];
-        this.drawCommit(e);
+      (e) => {
+        var t = this.commits[e];
+        this.drawCommit(t);
       }
     ).thenSingle("Creating Legend", () => {
       this.rootLabel = document.createElement("div"), this.rootLabel.className = "commit-legend", this.textPanel.appendChild(this.rootLabel);
     }).then(
       "Drawing Merges",
       () => Object.keys(this.commits),
-      (t) => {
-        var e = this.commits[t];
-        this.drawReferences(e);
+      (e) => {
+        var t = this.commits[e];
+        this.drawReferences(t);
       }
     ).thenSingle("Resizing", () => {
-      this.graphicalPanel.style.width = q(this.maxX + 1) + "px", this.graphicalPanel.style.height = this.getHeight() + "px";
+      this.graphicalPanel.style.width = W(this.maxX + 1) + "px", this.graphicalPanel.style.height = this.getHeight() + "px";
     }).start(), window.onresize = () => {
       this.al.then(
         "Redrawing",
         () => Object.keys(this.commits),
-        (t) => {
-          var e = this.commits[t];
-          e.view.redraw();
+        (e) => {
+          var t = this.commits[e];
+          t.view.redraw();
         }
       ).thenSingle("Resizing", () => {
-        this.graphicalPanel.style.width = q(this.maxX + 1) + "px", this.graphicalPanel.style.height = this.getHeight() + "px";
+        this.graphicalPanel.style.width = W(this.maxX + 1) + "px", this.graphicalPanel.style.height = this.getHeight() + "px";
       }).start(!1);
     };
   }
@@ -1196,105 +1220,105 @@ class et {
     return this.rootLabel.offsetTop - this.firstCommit.view.label.offsetTop;
   }
   buildGraph() {
-    var t = Object.keys(this.commits);
-    t.forEach((e) => {
-      var i = this.commits[e];
+    var e = Object.keys(this.commits);
+    e.forEach((t) => {
+      var i = this.commits[t];
       i.initRelations();
-    }), t.forEach((e) => {
-      var i = this.commits[e];
+    }), e.forEach((t) => {
+      var i = this.commits[t];
       i.initHeadSpecifity(), i.initMerges();
     }), this.initBranches();
   }
-  drawCommit(t) {
-    t.view = new bt(this.canvas, this.config, t), t.outOfScope === !1 && (t.view.label = this.drawLabel(t), t.view.label.onclick = function() {
-      console && console.debug(t);
-    }, this.textPanel.appendChild(t.view.label), t.view.label.style["padding-left"] = q(this.maxX + 1) + "px");
+  drawCommit(e) {
+    e.view = new yt(this.canvas, this.config, e), e.outOfScope === !1 && (e.view.label = this.drawLabel(e), e.view.label.onclick = function() {
+      console && console.debug(e);
+    }, this.textPanel.appendChild(e.view.label), e.view.label.style["padding-left"] = W(this.maxX + 1) + "px");
   }
-  drawReferences(t) {
-    t.view.addRelations(), t.view.redraw();
+  drawReferences(e) {
+    e.view.addRelations(), e.view.redraw();
   }
-  drawLabel(t) {
-    var e = document.createElement("gitline-legend"), i = t.getShortSha().trim(), s = t.getFullSha().trim(), m = T.extend(
+  drawLabel(e) {
+    var t = document.createElement("gitline-legend"), i = e.getShortSha().trim(), r = e.getFullSha().trim(), f = T.extend(
       document.createElement("gitline-sha")
     );
-    if (m.setAttribute("title", s), m.whenShort(i), m.whenFull(s), e.appendChild(m), e.appendChild(this.drawIdentity("author", t.author)), t.author.email != t.committer.email && e.appendChild(this.drawIdentity("committer", t.committer)), t.branch && t.branch.commit === t && !t.branch.anonymous) {
-      var C = T.extend(
+    if (f.setAttribute("title", r), f.whenShort(i), f.whenFull(r), t.appendChild(f), t.appendChild(this.drawIdentity("author", e.author)), e.author.email != e.committer.email && t.appendChild(this.drawIdentity("committer", e.committer)), e.branch && e.branch.commit === e && !e.branch.anonymous) {
+      var y = T.extend(
         document.createElement("gitline-ref")
       );
-      C.style.backgroundColor = t.getColor(40), C.whenShort(t.branch.ref), C.whenFull(t.branch.ref), e.appendChild(C);
+      y.style.backgroundColor = e.getColor(40), y.whenShort(e.branch.ref), y.whenFull(e.branch.ref), t.appendChild(y);
     }
-    var S = document.createElement("gitline-subject");
-    return S.innerHTML = t.subject, t.hasMerges() && S.classList.add("has-merges"), e.appendChild(S), e;
+    var C = document.createElement("gitline-subject");
+    return C.innerHTML = e.subject, e.hasMerges() && C.classList.add("has-merges"), t.appendChild(C), t;
   }
-  drawIdentity(t, e) {
+  drawIdentity(e, t) {
     var i = document.createElement(
       "gitline-identity-container"
-    ), s = T.extend(
+    ), r = T.extend(
       document.createElement("gitline-identity")
     );
-    s.classList.add(t);
-    var m = e.name + " &lt;" + e.email.toLowerCase() + "&gt;";
-    s.setAttribute(
+    r.classList.add(e);
+    var f = t.name + " &lt;" + t.email.toLowerCase() + "&gt;";
+    r.setAttribute(
       "title",
-      e.name + " <" + e.email.toLowerCase() + ">"
-    ), s.style.background = this.config.avatars.map((D) => "url(" + D(e.email) + ") no-repeat left center").join(", "), s.whenFull(m), s.whenShort("");
-    var C = T.extend(
+      t.name + " <" + t.email.toLowerCase() + ">"
+    ), r.style.background = this.config.avatars.map((P) => "url(" + P(t.email) + ") no-repeat left center").join(", "), r.whenFull(f), r.whenShort("");
+    var y = T.extend(
       document.createElement("gitline-identity-datetime")
     );
-    C.classList.add(t + "-datetime");
-    var S = e.date.toISOString().slice(0, 16).replace("T", " ");
-    return C.setAttribute("title", S), C.whenFull(S), C.whenShort(e.date.toISOString().slice(11, 16)), i.appendChild(s), i.appendChild(C), i;
+    y.classList.add(e + "-datetime");
+    var C = t.date.toISOString().slice(0, 16).replace("T", " ");
+    return y.setAttribute("title", C), y.whenFull(C), y.whenShort(t.date.toISOString().slice(11, 16)), i.appendChild(r), i.appendChild(y), i;
   }
   /*
    Based on the specifity assign the branches to the commits. if in doubt the commit will be on the most specific branch
    */
   initBranches() {
-    for (var t = Object.keys(this.headsMap), e = 0; e < t.length; e++) {
-      var i = t[e], s = this.headsMap[i];
-      s.commit.initDefaultBranch();
+    for (var e = Object.keys(this.headsMap), t = 0; t < e.length; t++) {
+      var i = e[t], r = this.headsMap[i];
+      r.commit.initDefaultBranch();
     }
-    var m = this;
-    t.sort(function(P, _) {
-      var f = m.headsMap[P].commit, p = m.headsMap[_].commit;
-      return f === p ? 0 : f.branch.category === p.branch.category ? f.branch.specifity - p.branch.specifity : f.branch.category.length - p.branch.category.length;
+    var f = this;
+    e.sort(function(D, _) {
+      var m = f.headsMap[D].commit, p = f.headsMap[_].commit;
+      return m === p ? 0 : m.branch.category === p.branch.category ? m.branch.specifity - p.branch.specifity : m.branch.category.length - p.branch.category.length;
     });
-    for (var C = 0, e = 0; e < t.length; e++) {
-      var i = t[e], s = this.headsMap[i], S = s.commit;
-      if (S.branch === s) {
-        s.lane = C, C++;
-        for (var D = 0; D < t.length; D++) {
-          for (var l = !0, k = 0; k < t.length; k++) {
-            var x = t[k], b = this.headsMap[x].commit;
-            (b === void 0 || b.branch != s && b.branch.lane === D && (S.intersects(b) || S.branch.category != b.branch.category)) && (l = !1);
+    for (var y = 0, t = 0; t < e.length; t++) {
+      var i = e[t], r = this.headsMap[i], C = r.commit;
+      if (C.branch === r) {
+        r.lane = y, y++;
+        for (var P = 0; P < e.length; P++) {
+          for (var l = !0, k = 0; k < e.length; k++) {
+            var S = e[k], b = this.headsMap[S].commit;
+            (b === void 0 || b.branch != r && b.branch.lane === P && (C.intersects(b) || C.branch.category != b.branch.category)) && (l = !1);
           }
           if (l) {
             console.debug(
               "NO INTERSECTS: ",
-              S.branch.ref,
+              C.branch.ref,
               " - ",
               b.branch.ref
-            ), s.lane = D;
+            ), r.lane = P;
             break;
           }
         }
-        this.maxX = Math.max(this.maxX, s.lane);
+        this.maxX = Math.max(this.maxX, r.lane);
       }
     }
   }
   // Launching
-  fromJSON(t) {
-    return this.fromProvider(new xt(t));
+  fromJSON(e) {
+    return this.fromProvider(new xt(e));
   }
-  fromGitHub(t, e, i) {
-    return this.fromProvider(new yt(t, e, i));
+  fromGitHub(e, t, i) {
+    return this.fromProvider(new bt(e, t, i));
   }
-  fromProvider(t) {
-    return this.commitProvider = t, this;
+  fromProvider(e) {
+    return this.commitProvider = e, this;
   }
-  renderTo(t) {
-    return this.headerPanel !== void 0 && t.appendChild(this.headerPanel), t.appendChild(
+  renderTo(e) {
+    return this.headerPanel !== void 0 && e.appendChild(this.headerPanel), e.appendChild(
       this.loadingPanel = document.createElement("gitline-loadingpanel")
-    ), t.appendChild(
+    ), e.appendChild(
       this.contentPanel = document.createElement("gitline-contentpanel")
     ), this.contentPanel.appendChild(
       this.graphicalPanel = document.createElement("gitline-graphicalpanel")
@@ -1302,8 +1326,8 @@ class et {
       this.textPanel = document.createElement("gitline-textpanel")
     ), this.al = new st(this.loadingPanel), this.render(), this;
   }
-  withHeader(t) {
-    return typeof t == "string" ? (this.headerPanel = document.createElement("gitline-headerpanel"), this.headerPanel.innerHTML = t) : this.headerPanel = t, this;
+  withHeader(e) {
+    return typeof e == "string" ? (this.headerPanel = document.createElement("gitline-headerpanel"), this.headerPanel.innerHTML = e) : this.headerPanel = e, this;
   }
 }
 export {

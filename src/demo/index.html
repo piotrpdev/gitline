@@ -21,6 +21,9 @@
         color: white;
         background: #525252;
       }
+      [for="examplejson"] {
+        margin-left: 40px;
+      }
     </style>
 
     <link rel="stylesheet" href="assets/lib/gitline.css"/>
@@ -31,17 +34,54 @@
       <a href="index.html">Homepage</a>
       <a href="portal.html">Portal</a>
       <a href="github.html">GitHub</a>
+
+      <label for="examplejson">Select an example:</label>
+      <span>/assets/data/</span>
+      <select name="examplejson" id="examplejson">
+        <option value="example01.json">example01.json</option>
+        <option value="example02.json" selected>example02.json</option>
+        <option value="example03.json">example03.json</option>
+        <option value="example04.json">example04.json</option>
+      </select>
     </header>
     
     <div id="myGitlinePanel-1"></div>
 
     <script>
-      Gitline.create()
-        .fromJSON("assets/data/example02.json")
-        .withHeader(
-          'Gitline repository <a href="https://github.com/blecher-at/gitline">https://github.com/blecher-at/gitline</a>'
-        )
+      function getHeader(jsonName) {
+        switch (jsonName) {
+          case "example01.json":
+            return `Gitline Example: <i>${jsonName}</i>. Likely made up.`;
+            break;
+          case "example02.json":
+            return `Gitline Example: <i>${jsonName}</i>. <a target="_blank" href="https://github.com/blecher-at/gitline">https://github.com/blecher-at/gitline</a>.`;
+            break;
+            case "example03.json":
+            return `Gitline Example: <i>${jsonName}</i>. Probably <a target="_blank" href="https://github.com/git/git">https://github.com/git/git</a>.`;
+            break;
+          case "example04.json":
+            return `Gitline Example: <i>${jsonName}</i>. Probably <a target="_blank" href="https://github.com/phalcon/incubator">https://github.com/phalcon/incubator</a>.`;
+            break;
+          default:
+            return `Gitline Example: <i>${jsonName}</i>`;
+            break;
+        }
+      }
+
+      function setToDropdownValue() {
+        document.querySelector("#myGitlinePanel-1").innerHTML = "";
+
+        const example = document.querySelector("#examplejson").value;
+
+        Gitline.create()
+        .fromJSON(`assets/data/${example}`)
+        .withHeader(getHeader(example))
         .renderTo(document.querySelector("#myGitlinePanel-1"));
+      }
+
+      document.querySelector("#examplejson").addEventListener("change", setToDropdownValue);
+
+      setToDropdownValue();
     </script>
   </body>
 </html>

@@ -64,16 +64,21 @@ export default class Gitline {
 
     this.al
       .thenSingle("Loading Data", () => {
-        this.al.suspend();
-        this.commitProvider.withCallback((json) => {
-          this.data = json;
-          this.al.resume();
+        return new Promise((resolve, reject) => {
+          this.al.suspend();
+          this.commitProvider.withCallback((json) => {
+            this.data = json;
+            this.al.resume();
+            resolve(null);
+          });
+    
+          this.commitProvider.withErrorCallback((error) => {
+            this.al.error(error);
+            reject(error);
+          });
+    
+          this.commitProvider.request();
         });
-
-        this.commitProvider.withErrorCallback((error) => {
-          this.al.error(error);
-        });
-        this.commitProvider.request();
       })
       .then(
         "Loading Commits",
