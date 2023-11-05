@@ -23,8 +23,8 @@
       }
     </style>
 
-    <link rel="stylesheet" href="/assets/lib/gitline.css"/>
-    <script src="/assets/lib/gitline.umd.cjs"></script>
+    <link rel="stylesheet" href="assets/lib/gitline.css"/>
+    <script src="assets/lib/gitline.umd.cjs"></script>
   </head>
   <body>
     <header>
@@ -58,12 +58,12 @@
 
     <script>
       Gitline.create()
-        .fromJSON("/assets/data/example02.json")
+        .fromJSON("assets/data/example02.json")
         .withHeader("Gitline repository from Github")
         .renderTo(document.querySelector("#myGitlinePanel-1"));
         
       Gitline.create()
-        .fromJSON("/assets/data/example03.json")
+        .fromJSON("assets/data/example03.json")
         .withHeader("git repository from Github")
         .renderTo(document.querySelector("#myGitlinePanel-2"));
     </script>
