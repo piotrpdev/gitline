@@ -10,17 +10,6 @@ Needs a JSON file as input (generated with [git2json](https://github.com/blecher
 
 gitline tries to be aware of your branching scheme. It will autodetect the category and assignment of branches and groups commits accordingly.
 
-## Run it on a server (requires docker)
-
-> [!WARNING]
-> I haven't created this image yet.
-
-```bash
-docker run -dP -e REPO_URL="https://github.com/piotrpdev/gitline" -e REPO_NAME="Gitline" piotrpdev/gitline
-```
-  
-see [/docker-image](https://github.com/piotrpdev/gitline/tree/master/docker-image) for more details
-
 ## Installation / Setup of development environment
 
 - Install Node.js
@@ -32,7 +21,7 @@ see [/docker-image](https://github.com/piotrpdev/gitline/tree/master/docker-imag
 ## Creating sample data
 
 - Install [git2json](https://github.com/blecher-at/git2json)
-- run `git json > myfile.json` - in a cronjob presumably
+- run `git json > myfile.json` - in a cronjob/github workflow presumably
 - point `src/demo/index.html` to the newly created JSON file
 
 ## Imports / Third party
