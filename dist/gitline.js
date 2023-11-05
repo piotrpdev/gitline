@@ -1026,7 +1026,7 @@ class yt extends tt {
     this.accessToken = s, this.limit = i;
   }
   gitURL(e, i, s = "") {
-    return e.indexOf("api.github.com") == -1 && (e = e.replace(/.*github.com/, "https://api.github.com/repos/").replace(/\/\//g, "/")), e + "/" + i + "?per_page=" + this.limit + "&" + s;
+    return e.indexOf("api.github.com") == -1 && (e = e.replace(/.*github.com\//, "https://api.github.com/repos/")), e + "/" + i + "?per_page=" + this.limit + "&" + s;
   }
   onRequested(e) {
     this.loadForks(e);
