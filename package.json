@@ -12,9 +12,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "dev:demo": "vite --config vite-demo.config.ts",
+    "dev:demo": "vite build && vite --config vite-demo.config.ts",
     "build": "tsc && vite build",
-    "build:demo": "vite build --config vite-demo.config.ts",
+    "build:demo": "vite build && vite build --config vite-demo.config.ts",
     "test": "vitest --dir src/test"
   },
   "devDependencies": {
