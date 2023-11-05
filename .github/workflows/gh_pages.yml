@@ -1,8 +1,5 @@
 name: Build and Deploy demo to GH Pages
-on:
-  push:
-    tags:        
-      - '*'
+on: workflow_dispatch
 permissions:
   contents: write
 jobs:
