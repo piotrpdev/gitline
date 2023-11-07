@@ -14,15 +14,39 @@ gitline tries to be aware of your branching scheme. It will autodetect the categ
 
 ## Usage
 
+[![NPM](https://nodei.co/npm/@piotrpdev/gitline.png)](https://nodei.co/npm/@piotrpdev/gitline/)
+
 [An NPM package is available for this project](https://www.npmjs.com/package/@piotrpdev/gitline). You can see typical usage in [`src/demo/`](src/demo/).
 
 It usually looks something like this:
 
-```js
-Gitline.create()
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Gitline Example</title>
+
+    <!-- jQuery required by JSGL -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- JSGL used for generating pretty SVG Git lines -->
+    <script src="https://cdn.jsdelivr.net/gh/jsgl/repo@6231386/jsgl.min.js"></script>
+    <!-- Optional styles to make stuff look nice -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@piotrpdev/gitline@1.0.4/dist/gitline.min.css"/>
+    <!-- This library -->
+    <script src="https://cdn.jsdelivr.net/npm/@piotrpdev/gitline@1.0.4/dist/gitline.umd.min.js"></script>
+  </head>
+  <body>
+    <div id="myGitlinePanel-1"></div>
+
+    <script>
+      Gitline.create()
         .fromJSON(`assets/data/example02.json`)
         .withHeader("<h1>My Gitline</h1>")
         .renderTo(document.querySelector("#myGitlinePanel-1"));
+    </script>
+  </body>
+</html>
 ```
 
 ## Creating sample data
