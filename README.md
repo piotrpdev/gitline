@@ -14,7 +14,7 @@ gitline tries to be aware of your branching scheme. It will autodetect the categ
 
 ## Usage
 
-[An NPM package is available for this project](https://www.npmjs.com/package/@piotrpdev/gitline). You can see typicial usage in [`src/demo`](src/demo).
+[An NPM package is available for this project](https://www.npmjs.com/package/@piotrpdev/gitline). You can see typical usage in [`src/demo/`](src/demo/).
 
 It usually looks something like this:
 
