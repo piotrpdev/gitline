@@ -12,13 +12,18 @@ Needs a JSON file as input (generated with [git2json](https://github.com/blecher
 
 gitline tries to be aware of your branching scheme. It will autodetect the category and assignment of branches and groups commits accordingly.
 
-## Installation / Setup of development environment
+## Usage
 
-- Install Node.js
-- Install dependencies: `npm install`
-- Build the library: `npm run build`
-- View the examples: `npm run dev:demo`
-- Test the library: `npm run test`
+[An NPM package is available for this project](https://www.npmjs.com/package/@piotrpdev/gitline). You can see typicial usage in [`src/demo`](src/demo).
+
+It usually looks something like this:
+
+```js
+Gitline.create()
+        .fromJSON(`assets/data/example02.json`)
+        .withHeader("<h1>My Gitline</h1>")
+        .renderTo(document.querySelector("#myGitlinePanel-1"));
+```
 
 ## Creating sample data
 
@@ -32,6 +37,14 @@ gitline tries to be aware of your branching scheme. It will autodetect the categ
 - SVG Rendering: [JSGL](https://github.com/jsgl/repo)  
   - Uses [jQuery](https://jquery.org/)
 - Hash Generation: [Crypto JS](https://github.com/brix/crypto-js)
+
+## Development
+
+- Install Node.js
+- Install dependencies: `npm install`
+- Build the library: `npm run build`
+- View the examples: `npm run dev:demo`
+- Test the library: `npm run test`
 
 ## Legal / License
 

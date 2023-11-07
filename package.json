@@ -1,6 +1,6 @@
 {
   "name": "@piotrpdev/gitline",
-  "version": "0.0.2",
+  "version": "1.0.2",
   "description": "Graphical git UI",
   "author": "Piotr Placzek <piotrpdev@gmail.com>",
   "license": "AGPL-3.0-only",
@@ -37,12 +37,12 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/gitline.umd.cjs",
+  "main": "./dist/gitline.umd.js",
   "module": "./dist/gitline.js",
   "exports": {
     ".": {
       "import": "./dist/gitline.js",
-      "require": "./dist/gitline.umd.cjs"
+      "require": "./dist/gitline.umd.js"
     }
   },
   "dependencies": {
