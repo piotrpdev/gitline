@@ -1,4 +1,4 @@
-import MD5 from "crypto-js/md5";
+import { hash } from "spark-md5";
 
 declare var jsgl: any;
 
@@ -13,8 +13,9 @@ export class Config {
 
 	public remoteOnly: boolean = false;
 
-	private avatar_gravatar(email) {
-		return "https://www.gravatar.com/avatar/" + MD5(email.toLowerCase()) + "?s=20&d=mm";
+	// https://docs.gravatar.com/general/images/
+	private avatar_gravatar(email: string) {
+		return "https://www.gravatar.com/avatar/" + hash(email.toLowerCase()) + "?s=20&d=retro";
 	}
 
 	public avatars: Function[] = [this.avatar_gravatar];

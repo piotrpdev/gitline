@@ -1,6 +1,6 @@
 {
   "name": "@piotrpdev/gitline",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Graphical git UI",
   "author": "Piotr Placzek <piotrpdev@gmail.com>",
   "license": "AGPL-3.0-only",
@@ -18,8 +18,8 @@
     "test": "vitest --dir src/test"
   },
   "devDependencies": {
-    "@types/crypto-js": "^4.1.3",
     "@types/node": "^20.8.10",
+    "@types/spark-md5": "^3.0.4",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vite-plugin-static-copy": "^0.17.0",
@@ -46,6 +46,6 @@
     }
   },
   "dependencies": {
-    "crypto-js": "^4.2.0"
+    "spark-md5": "^3.0.2"
   }
 }

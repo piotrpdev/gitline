@@ -60,7 +60,7 @@ It usually looks something like this:
 - Programming language: [TypeScript](http://www.typescriptlang.org/)
 - SVG Rendering: [JSGL](https://github.com/jsgl/repo)  
   - Uses [jQuery](https://jquery.org/)
-- Hash Generation: [Crypto JS](https://github.com/brix/crypto-js)
+- Hash Generation ([Gravatar](https://docs.gravatar.com/general/images/)): [SparkMD5](https://github.com/satazor/js-spark-md5)
 
 ## Development
 
