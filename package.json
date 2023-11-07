@@ -1,6 +1,6 @@
 {
   "name": "@piotrpdev/gitline",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Graphical git UI",
   "author": "Piotr Placzek <piotrpdev@gmail.com>",
   "license": "AGPL-3.0-only",
@@ -28,7 +28,7 @@
   "homepage": "https://github.com/piotrpdev/gitline#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/piotrpdev/gitline.git"
+    "url": "git+https://github.com/piotrpdev/gitline.git"
   },
   "bugs": {
     "url": "https://github.com/piotrpdev/gitline/issues"
@@ -38,10 +38,10 @@
   ],
   "type": "module",
   "main": "./dist/gitline.umd.js",
-  "module": "./dist/gitline.js",
+  "module": "./dist/gitline.es.js",
   "exports": {
     ".": {
-      "import": "./dist/gitline.js",
+      "import": "./dist/gitline.es.js",
       "require": "./dist/gitline.umd.js"
     }
   },
